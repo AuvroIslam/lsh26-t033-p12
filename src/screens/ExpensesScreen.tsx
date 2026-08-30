@@ -484,22 +484,22 @@ export default function ExpensesScreen() {
             body="Add an expense above, or load one of the published sample cases from the header."
           />
         ) : (
-          <div className="max-h-[520px] overflow-y-auto">
+          <div className="max-h-[520px] overflow-x-auto overflow-y-auto">
             <table className="w-full text-left text-[13px]">
               <thead className="sticky top-0 bg-[var(--card)]">
                 <tr className="border-b border-[var(--edge)] text-[11px] tracking-wide text-[var(--muted)] uppercase">
-                  <th className="px-5 py-2.5 font-semibold">Date</th>
+                  <th className="hidden px-5 py-2.5 font-semibold sm:table-cell">Date</th>
                   <th className="px-3 py-2.5 font-semibold">Shop</th>
                   <th className="px-3 py-2.5 font-semibold">Category</th>
                   <th className="px-3 py-2.5 text-right font-semibold">Amount</th>
-                  <th className="px-3 py-2.5 font-semibold">Source</th>
+                  <th className="hidden px-3 py-2.5 font-semibold sm:table-cell">Source</th>
                   <th className="px-5 py-2.5" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--edge)]/15">
                 {sorted.map((e) => (
                   <tr key={e.id} className={monthOf(e.date) === monthOf(today) ? '' : 'opacity-60'}>
-                    <td className="tabular px-5 py-2.5 whitespace-nowrap">{dateLabel(e.date)}</td>
+                    <td className="tabular hidden px-5 py-2.5 whitespace-nowrap sm:table-cell">{dateLabel(e.date)}</td>
                     <td className="px-3 py-2.5 font-medium">
                       <span className="flex items-center gap-2">
                         {e.receipt?.imageDataUrl && (
@@ -509,7 +509,12 @@ export default function ExpensesScreen() {
                             className="size-7 shrink-0 rounded border border-[var(--edge)] object-cover"
                           />
                         )}
-                        {e.shop}
+                        <span className="min-w-0">
+                          <span className="block truncate">{e.shop}</span>
+                          <span className="block text-[11px] font-normal text-[var(--muted)] sm:hidden">
+                            {dateLabel(e.date)}
+                          </span>
+                        </span>
                       </span>
                     </td>
                     <td className="px-3 py-2.5">
@@ -524,7 +529,7 @@ export default function ExpensesScreen() {
                     <td className="tabular px-3 py-2.5 text-right font-semibold whitespace-nowrap">
                       {displayMoney(e.amount)}
                     </td>
-                    <td className="px-3 py-2.5">
+                    <td className="hidden px-3 py-2.5 sm:table-cell">
                       {e.source === 'receipt' ? (
                         <Badge tone="brand">
                           receipt

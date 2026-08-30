@@ -30,7 +30,13 @@ const ToastContext = createContext<ToastApi>({ push: () => {} });
 /** Announce something to the user. Safe to call from anywhere below the provider. */
 export const useToast = (): ToastApi => useContext(ToastContext);
 
-const LIFETIME_MS = 5000;
+/**
+ * How long a toast stays up.
+ *
+ * Long enough to notice an Undo on a phone, where the eye has to travel and
+ * the thumb has to reach; short enough not to stack up during quick entry.
+ */
+const LIFETIME_MS = 7000;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -85,22 +91,24 @@ function ToastRow({ toast, onDismiss }: { toast: Toast; onDismiss: () => void })
             </p>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1.5">
           {toast.undo && (
+            // Sized for a thumb: undo is the one control here with a deadline
+            // on it, so it has to be comfortably tappable on a phone.
             <button
               onClick={() => {
                 toast.undo?.();
                 onDismiss();
               }}
-              className="nb-sm nb-press rounded-full bg-[var(--card)] px-2.5 py-1 text-[11px] font-bold text-[var(--text)]"
+              className="nb-sm nb-press min-h-11 rounded-full bg-[var(--card)] px-4 text-[13px] font-bold text-[var(--text)]"
             >
               Undo
             </button>
           )}
           <button
             onClick={onDismiss}
-            aria-label="Dismiss"
-            className="rounded-full px-1.5 text-[15px] leading-none font-bold text-[var(--text)]/50 hover:text-[var(--text)]"
+            aria-label="Dismiss notification"
+            className="grid size-11 shrink-0 place-items-center rounded-full text-[18px] leading-none font-bold text-[var(--text)]/55 hover:bg-black/5 hover:text-[var(--text)]"
           >
             ×
           </button>

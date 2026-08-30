@@ -16,11 +16,11 @@ const PocketsScreen = lazy(() => import('./screens/PocketsScreen'));
 
 type Tab = 'dashboard' | 'expenses' | 'forecast' | 'pockets';
 
-const TABS: Array<{ id: Tab; label: string; req: string }> = [
-  { id: 'dashboard', label: 'Dashboard', req: 'R2' },
-  { id: 'expenses', label: 'Expenses & receipts', req: 'R1' },
-  { id: 'forecast', label: 'Forecast & insights', req: 'R3' },
-  { id: 'pockets', label: 'Savings pockets', req: 'R4' },
+const TABS: Array<{ id: Tab; label: string; short: string; req: string }> = [
+  { id: 'dashboard', label: 'Dashboard', short: 'Dashboard', req: 'R2' },
+  { id: 'expenses', label: 'Expenses & receipts', short: 'Expenses', req: 'R1' },
+  { id: 'forecast', label: 'Forecast & insights', short: 'Forecast', req: 'R3' },
+  { id: 'pockets', label: 'Savings pockets', short: 'Pockets', req: 'R4' },
 ];
 
 export default function App() {
@@ -82,12 +82,12 @@ export default function App() {
 
             {/* Sample-data controls. A judge can load any of the 25 published
                 cases and reset, without touching the console. */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex w-full items-center gap-2 sm:w-auto">
               <select
                 value={caseId ?? ''}
                 onChange={(e) => void onPickCase(e.target.value)}
                 disabled={loadingCase || cases.length === 0}
-                className="nb-sm rounded-full bg-[var(--card)] px-3.5 py-2 text-[13px] font-bold text-[var(--text)] outline-none disabled:opacity-45"
+                className="nb-sm min-w-0 flex-1 rounded-full bg-[var(--card)] px-3.5 py-2 text-[13px] font-bold text-[var(--text)] outline-none disabled:opacity-45 sm:flex-none"
                 aria-label="Load a published sample case"
               >
                 <option value="">
@@ -99,7 +99,7 @@ export default function App() {
                   </option>
                 ))}
               </select>
-              <Button variant="outline" size="sm" onClick={reset}>
+              <Button variant="outline" size="sm" onClick={reset} className="shrink-0 whitespace-nowrap">
                 Clear ledger
               </Button>
             </div>
@@ -115,7 +115,7 @@ export default function App() {
             <span>
               Today: <strong className="font-extrabold text-[var(--text)]">{dateLabel(today)}</strong>
             </span>
-            <span>
+            <span className="hidden sm:inline">
               Month: <strong className="font-extrabold text-[var(--text)]">{monthLabel(monthOf(today))}</strong>
             </span>
             <span>
@@ -131,13 +131,19 @@ export default function App() {
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
+                // The visible label shortens on a phone, so the full name is
+                // kept here: assistive technology and search should not lose
+                // the requirement mapping just because the screen is narrow.
+                aria-label={`${t.label} (${t.req})`}
+                aria-current={tab === t.id ? 'page' : undefined}
                 className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-[13px] font-bold transition-all duration-150 ${
                   tab === t.id
                     ? 'nb-sm nb-press bg-lilac text-lilac-ink'
                     : 'border-2 border-transparent text-[var(--text)]/70 hover:bg-white/55 hover:text-[var(--text)]'
                 }`}
               >
-                {t.label}
+                <span className="sm:hidden">{t.short}</span>
+                <span className="hidden sm:inline">{t.label}</span>
                 <span
                   className={`rounded px-1 py-px text-[10px] font-bold ${
                     tab === t.id

@@ -488,6 +488,12 @@ rather than the blank page React 19 otherwise leaves behind. Every action that c
 a toast naming the amount, and deletions carry an **Undo**. The four screens are code-split, so the
 initial download is 211 KB rather than the 674 KB it was when Recharts sat in the main bundle.
 
+**Mobile.** Verified at 390px on every tab: no horizontal overflow anywhere, no interactive control
+below a 40px tap target, and the expense table drops its date and source columns rather than forcing
+the card wide, carrying the date under the shop name instead. The header condenses to two rows and
+the tab labels shorten, while the full names are kept as `aria-label` so assistive technology does
+not lose the requirement mapping on a narrow screen.
+
 **Interface.** A soft neo-brutalist treatment: solid dark borders with hard, unblurred offset shadows,
 rounded cards on a lavender ground, and a rotating pastel accent set. Money is the deliberate
 exception — figures stay near-black on white, with colour carrying containers and category identity

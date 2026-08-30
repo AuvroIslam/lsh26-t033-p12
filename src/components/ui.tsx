@@ -93,7 +93,8 @@ export function Button({
 }) {
   const base =
     'nb-sm nb-press inline-flex items-center justify-center gap-2 rounded-full font-bold text-[var(--text)] disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none disabled:hover:transform-none';
-  const sizes = { sm: 'px-3.5 py-1.5 text-[13px]', md: 'px-5 py-2.5 text-sm' };
+  // Minimum heights keep every control comfortably tappable on a phone.
+  const sizes = { sm: 'min-h-10 px-3.5 py-1.5 text-[13px]', md: 'min-h-11 px-5 py-2.5 text-sm' };
   const variants = {
     primary: 'bg-butter hover:bg-[#ffdb7d]',
     outline: 'bg-[var(--card)] hover:bg-lav-50',
