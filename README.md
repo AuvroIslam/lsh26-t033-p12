@@ -17,6 +17,11 @@ Solution for **LofiStack Hackathon 2026 — P12**
 
 > Judges will evaluate only the exact commit SHA entered in the Final Submission Form.
 
+
+<p align="center">
+  <img src="docs/slides/slide-01.png" alt="Khoroch — a personal ledger that reads your receipts" width="820">
+</p>
+
 ## Solution summary
 
 A single-page web application that tracks a monthly salary against real spending. Expenses can be
@@ -36,6 +41,7 @@ all four requirements within about a minute.
 
 ```mermaid
 flowchart TB
+    classDef default fill:#ffffff,stroke:#2b2440,stroke-width:2px,color:#201a33;
     subgraph browser["Browser — the entire application"]
         direction TB
 
@@ -76,14 +82,20 @@ flowchart TB
     ocr -.raw text.-> SV1
     SV5 -.fetch.-> fixture
 
-    style browser fill:#f4f0fd,stroke:#2b2440,stroke-width:2px
-    style screens fill:#d9c9f7,stroke:#2b2440,stroke-width:2px
-    style services fill:#b8e6d4,stroke:#2b2440,stroke-width:2px
-    style libs fill:#ffe49b,stroke:#2b2440,stroke-width:2px
-    style storage fill:#ffcfa8,stroke:#2b2440,stroke-width:2px
-    style ocr fill:#ffc9d9,stroke:#2b2440,stroke-width:2px
-    style pre fill:#ffcfa8,stroke:#2b2440,stroke-width:2px
-    style fixture fill:#bcd9f7,stroke:#2b2440,stroke-width:2px
+    classDef lav fill:#f4f0fd,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef lilac fill:#d9c9f7,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef mint fill:#b8e6d4,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef butter fill:#ffe49b,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef peach fill:#ffcfa8,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef blush fill:#ffc9d9,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef sky fill:#bcd9f7,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    class browser lav;
+    class screens lilac;
+    class services mint;
+    class libs butter;
+    class storage,pre peach;
+    class ocr blush;
+    class fixture sky;
 ```
 
 The layering is strict: **screens → store → services → storage**. A screen never computes money and
@@ -99,6 +111,11 @@ and why a build of this length has a real test suite rather than a token one.
 | R4 — pockets & DPS | `pocket.service.ts` | `PocketsScreen.tsx` |
 
 ---
+
+
+<p align="center">
+  <img src="docs/slides/slide-03.png" alt="One ledger, four answers — R1 to R4" width="820">
+</p>
 
 ## Verifying the four requirements in five minutes
 
@@ -117,6 +134,7 @@ The requirement's weight is on the second half — the read must be **shown**, a
 
 ```mermaid
 flowchart LR
+    classDef default fill:#ffffff,stroke:#2b2440,stroke-width:2px,color:#201a33;
     A["Upload or<br/>photograph a bill"] --> P["Preprocess<br/>scale · greyscale ·<br/>adaptive binarise"]
     P --> B["Tesseract.js<br/>in-browser OCR<br/>self-hosted"]
     B --> C["parseReceiptText<br/>amount · date · shop<br/>+ confidence + reason"]
@@ -128,11 +146,18 @@ flowchart LR
     F --> H
     M["Add by hand<br/>fallback path"] --> H
 
-    style D fill:#ffe49b,stroke:#2b2440,stroke-width:2px
-    style H fill:#b8e6d4,stroke:#2b2440,stroke-width:2px
-    style G fill:#ffc9d9,stroke:#2b2440,stroke-width:2px
-    style M fill:#bcd9f7,stroke:#2b2440,stroke-width:2px
-    style P fill:#ffcfa8,stroke:#2b2440,stroke-width:2px
+    classDef lav fill:#f4f0fd,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef lilac fill:#d9c9f7,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef mint fill:#b8e6d4,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef butter fill:#ffe49b,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef peach fill:#ffcfa8,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef blush fill:#ffc9d9,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef sky fill:#bcd9f7,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    class D butter;
+    class H mint;
+    class G blush;
+    class M sky;
+    class P peach;
 ```
 
 Walking it:
@@ -169,6 +194,11 @@ Ambiguous dates are handled honestly rather than confidently. `14/04/2026` is re
 confidence because `14` cannot be a month; `05/04/2026` is read day-first as is usual in Bangladesh
 but marked **please check**, because the app cannot actually know.
 
+
+<p align="center">
+  <img src="docs/slides/slide-08.png" alt="The dashboard, loaded from sample case PUB-01" width="820">
+</p>
+
 ### R2 — Monthly dashboard → the **Dashboard** tab
 
 > *"Show a monthly dashboard: total spent against salary, a breakdown by category, the largest
@@ -197,6 +227,7 @@ wants to see and the case a naive grouping silently drops. On `PUB-01`, Educatio
 
 ```mermaid
 flowchart TB
+    classDef default fill:#ffffff,stroke:#2b2440,stroke-width:2px,color:#201a33;
     A["Expenses this month"] --> B{"Recurring fixed charge?<br/>once last month ·<br/>at most once this month ·<br/>worth 3+ days of average"}
     B -->|"no"| D["Day-to-day spending"]
     B -->|"yes — e.g. Rent"| C["Held out of the rate"]
@@ -208,10 +239,17 @@ flowchart TB
     H --> I["Projected left or short<br/>= salary - projected total"]
     I --> J["9 insight generators<br/>ranked by materiality"]
 
-    style B fill:#ffe49b,stroke:#2b2440,stroke-width:2px
-    style C fill:#ffcfa8,stroke:#2b2440,stroke-width:2px
-    style I fill:#b8e6d4,stroke:#2b2440,stroke-width:2px
-    style J fill:#d9c9f7,stroke:#2b2440,stroke-width:2px
+    classDef lav fill:#f4f0fd,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef lilac fill:#d9c9f7,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef mint fill:#b8e6d4,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef butter fill:#ffe49b,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef peach fill:#ffcfa8,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef blush fill:#ffc9d9,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef sky fill:#bcd9f7,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    class B butter;
+    class C peach;
+    class I mint;
+    class J lilac;
 ```
 
 The card *How the forecast is calculated* prints this arithmetic on screen so it can be reproduced on
@@ -234,6 +272,11 @@ money each concerns. On `PUB-01` they include:
 - *"Groceries is down ৳7,713.00 on last month"* — ৳546.50 against ৳8,259.50.
 - *"Rent, Mobile, Utilities are 82% of spending"* — ৳22,188.50 of ৳27,083.00 between them.
 
+
+<p align="center">
+  <img src="docs/slides/slide-09.png" alt="The same ledger on a phone" width="820">
+</p>
+
 ### R4 — Savings pockets → the **Savings pockets** tab
 
 > *"Let the user create savings pockets for specific items, each with a name, a target amount, item
@@ -242,6 +285,7 @@ money each concerns. On `PUB-01` they include:
 
 ```mermaid
 flowchart LR
+    classDef default fill:#ffffff,stroke:#2b2440,stroke-width:2px,color:#201a33;
     A["Forecast surplus<br/>projected left this month"] --> B["Fund pockets<br/>in creation order"]
     B --> C{"Contribution<br/>affordable?"}
     C -->|"yes"| D["Planned completion<br/>date stands"]
@@ -252,10 +296,17 @@ flowchart LR
     F --> G
     G --> H["Month-by-month schedule:<br/>deposit → interest → balance"]
 
-    style A fill:#b8e6d4,stroke:#2b2440,stroke-width:2px
-    style E fill:#ffe49b,stroke:#2b2440,stroke-width:2px
-    style F fill:#ffc9d9,stroke:#2b2440,stroke-width:2px
-    style H fill:#d9c9f7,stroke:#2b2440,stroke-width:2px
+    classDef lav fill:#f4f0fd,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef lilac fill:#d9c9f7,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef mint fill:#b8e6d4,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef butter fill:#ffe49b,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef peach fill:#ffcfa8,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef blush fill:#ffc9d9,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef sky fill:#bcd9f7,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    class A mint;
+    class E butter;
+    class F blush;
+    class H lilac;
 ```
 
 `PUB-01` loads three pockets — Wedding, Laptop and Bike — each with name, item details, target and
@@ -351,15 +402,23 @@ later months earn on accumulated interest.
 
 ```mermaid
 flowchart LR
+    classDef default fill:#ffffff,stroke:#2b2440,stroke-width:2px,color:#201a33;
     A["balance"] --> B["+ deposit"]
     B --> C["interest =<br/>balance x rate / 12 / 100"]
     C --> D["round half up<br/>to the paisa"]
     D --> E["balance = balance + interest"]
     E -->|"next month"| B
 
-    style C fill:#ffe49b,stroke:#2b2440,stroke-width:2px
-    style D fill:#ffcfa8,stroke:#2b2440,stroke-width:2px
-    style E fill:#b8e6d4,stroke:#2b2440,stroke-width:2px
+    classDef lav fill:#f4f0fd,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef lilac fill:#d9c9f7,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef mint fill:#b8e6d4,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef butter fill:#ffe49b,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef peach fill:#ffcfa8,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef blush fill:#ffc9d9,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    classDef sky fill:#bcd9f7,stroke:#2b2440,stroke-width:2px,color:#201a33;
+    class C butter;
+    class D peach;
+    class E mint;
 ```
 
 Worked check at 8.00% on a 20,000.00 monthly deposit — these exact figures are asserted by the test
@@ -424,6 +483,11 @@ src/
 ```
 
 ---
+
+
+<p align="center">
+  <img src="docs/slides/slide-06.png" alt="The forecast: why the obvious method was wrong" width="820">
+</p>
 
 ## Problem-solving approach
 
@@ -623,29 +687,6 @@ in it is not something the code can produce.
 
 ---
 
-## Presentation
-
-The slide deck is committed at
-[`Khoroch-LSH26-T033-P12.pptx`](Khoroch-LSH26-T033-P12.pptx), with every slide also exported to PNG
-in [`docs/slides/`](docs/slides/) so it can be read without PowerPoint.
-
-| | |
-| --- | --- |
-| ![Title](docs/slides/slide-01.png) | ![The problem](docs/slides/slide-02.png) |
-| **01 — Khoroch** | **02 — The problem** |
-| ![Our solution](docs/slides/slide-03.png) | ![Architecture](docs/slides/slide-04.png) |
-| **03 — One ledger, four answers** | **04 — Strict layers, pure engines** |
-| ![Reading a receipt](docs/slides/slide-05.png) | ![The forecast](docs/slides/slide-06.png) |
-| **05 — R1 · We never guess silently** | **06 — R3 · The obvious method was wrong** |
-| ![Correctness](docs/slides/slide-07.png) | ![The product](docs/slides/slide-08.png) |
-| **07 — Money is integer paisa** | **08 — The product** |
-| ![On a phone](docs/slides/slide-09.png) | ![Compliance](docs/slides/slide-10.png) |
-| **09 — On a phone** | **10 — Every box, ticked** |
-| ![Thank you](docs/slides/slide-11.png) | |
-| **11 — Thank you** | |
-
----
-
 ## Repository records
 
 | File | Contents |
@@ -654,3 +695,10 @@ in [`docs/slides/`](docs/slides/) so it can be read without PowerPoint.
 | [`evaluation-manifest.json`](evaluation-manifest.json) | Structured judging evidence |
 | [`LICENSES.md`](LICENSES.md) | Every framework, library, font and asset used |
 | [`sample-data/`](sample-data/) | The published fixture, unmodified |
+| [`Khoroch-LSH26-T033-P12.pptx`](Khoroch-LSH26-T033-P12.pptx) | The presentation deck, also exported to [`docs/slides/`](docs/slides/) |
+
+---
+
+<p align="center">
+  <img src="docs/slides/slide-11.png" alt="Thank you — Team Logarithm" width="820">
+</p>
