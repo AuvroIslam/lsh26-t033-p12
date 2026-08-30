@@ -2,60 +2,70 @@
   "team_id": "LSH26-T033",
   "problem_id": "P12",
   "repository_name": "lsh26-t033-p12",
-  "live_url": "TODO: deployed URL",
+  "live_url": "TODO: paste the deployed URL before submitting",
   "demo_video_url_optional": "",
   "event_start_code": "LSH26-8490-C900",
   "repository_created_before_release": false,
   "pre_event_materials": [],
   "sample_data": {
     "loads_published_fixture": true,
-    "method": "TODO: file upload / paste JSON / manual entry",
-    "reset_instructions": "TODO: explain how judges restore the initial data."
+    "method": "Built in. The fixture is committed at sample-data/P12_personal_ledger_public.json and served unmodified from public/. Every one of the 25 cases is listed in the header dropdown labelled 'Load a sample case…'; choosing one replaces the ledger with that case's salary, expenses, pockets and DPS rate, and sets the date the app treats as 'today' to the case's own `today` value, because the published cases are dated in 2026.",
+    "reset_instructions": "'Clear ledger' in the header empties the salary, expenses and pockets. Selecting a case again restores it exactly. State is held only in the browser's localStorage, so a private window also starts clean."
   },
-  "problem_solving_method": "TODO: briefly explain the approach and why the team chose it.",
+  "problem_solving_method": "The four requirements reduce to two pure engines with an interface around them: a forecast that turns spending so far into an expectation for the rest of the month, and a DPS schedule that turns a monthly contribution into a balance over time. R2 shows the forecast's inputs, R3 explains its output, and R4 feeds the DPS engine from it. Both engines are pure functions in src/services/ with no React dependency, tested directly against the published fixture. Every amount is held as integer paisa rather than floating-point Taka, because the fixture supplies decimal strings and the DPS rule compounds monthly with half-up rounding at each step, so float drift would appear in exactly the figures being marked.",
   "requirements": {
     "R1": {
-      "status": "not_attempted",
-      "evidence": "Set a monthly salary; add expenses including by bill photo; show what was read and allow correction before saving"
+      "status": "complete",
+      "evidence": "Expenses & receipts tab. Salary is set at the top of the screen. 'Add an expense from a receipt photo' runs Tesseract.js OCR in the browser and opens a review panel before anything is saved: the uploaded image, the full raw OCR text behind a toggle, and the amount, date, shop and category as editable fields, each carrying a confidence badge (read clearly / please check / not found) and a note on how the value was chosen. Fields the user changes are recorded with the expense and shown in the ledger as 'receipt · N corrected' or 'receipt · as read'. 'Add an expense by hand' is the manual path and the fallback if a receipt will not read. Code: src/services/receipt.service.ts, src/screens/ExpensesScreen.tsx. Parser behaviour is pinned in src/services/__tests__/receipt.test.mjs, including that a receipt reading 'Subtotal 1505.50 / VAT 5% 75.28 / TOTAL 1580.78 / Cash 2000.00' yields 1580.78 rather than the larger cash figure."
     },
     "R2": {
-      "status": "not_attempted",
-      "evidence": "Monthly dashboard: total spent against salary, category breakdown, largest expenses, change vs last month"
+      "status": "complete",
+      "evidence": "Dashboard tab: salary, total spent, money left or over, and the change against last month as four summary figures; a salary-consumption bar showing the percentage used; a category donut with per-category totals, entry counts and share of the month; the five largest single charges with their share of the month; and a month-on-month bar chart with a full comparison table giving last month, this month, the change in Taka and the change as a percentage for every category present in either month. Code: src/services/forecast.service.ts, src/screens/DashboardScreen.tsx."
     },
     "R3": {
-      "status": "not_attempted",
-      "evidence": "Forecast and written insights from actual numbers, with at least three insights naming specific categories and amounts"
+      "status": "complete",
+      "evidence": "Forecast & insights tab: daily rate so far, expected spending for the rest of the month, projected month total, and projected money left or short at month end, plus a spending-path chart drawn solid to today and dashed thereafter against the salary line. The arithmetic is printed in full under 'How the forecast is calculated' so it can be reproduced by hand. Eight insights are generated from the figures and ranked by how much money each concerns; every generator returns nothing when the data does not support it, so no insight can appear without naming a real category and amount. On sample case PUB-01 they include 'Mobile is up ৳2,500.00 on last month' (৳3,589.00 against ৳1,089.00 in March, a rise of 229.6%), 'Groceries is down ৳7,713.00 on last month', and 'Rent, Mobile, Utilities are 82% of spending'. Code: src/services/insight.service.ts, src/screens/ForecastScreen.tsx."
     },
     "R4": {
-      "status": "not_attempted",
-      "evidence": "Savings pockets with expected completion date from the forecast and DPS return at a stated rate"
+      "status": "complete",
+      "evidence": "Savings pockets tab. Each pocket carries a name, item details, a target and a monthly contribution, and shows an expected completion month, whether the forecast can fund the contribution, and an expandable month-by-month DPS schedule listing every deposit, the interest credited and the running balance. The DPS rate is stated on screen next to every projection and in a dedicated card explaining the rule; loading a sample case sets the rate that case specifies. The DPS follows the fixture rule verbatim — deposit added first, then interest of balance × rate ÷ 12 ÷ 100 rounded half up to the paisa and added, so later months earn on credited interest. Where the forecast cannot fund the planned contribution, both the planned completion date and the date the forecast actually supports are shown rather than only the optimistic one. Code: src/services/pocket.service.ts, src/screens/PocketsScreen.tsx."
     }
   },
   "team_members": [
     {
       "registered_name": "Oitijya Islam Auvro",
       "github_username": "AuvroIslam",
-      "major_contribution": "TODO",
+      "major_contribution": "TODO: fill in before submitting",
       "evidence_paths_or_commits": []
     },
     {
-      "registered_name": "TODO: member name",
+      "registered_name": "TODO: second member name",
       "github_username": "TODO",
       "major_contribution": "TODO",
       "evidence_paths_or_commits": []
     }
   ],
   "major_design_decisions": [
-    "TODO: decision and short reason"
+    "Receipt reading runs in the browser with Tesseract.js rather than a hosted vision API. A cloud model would read more accurately, but it needs an API key and the rules forbid committing one, which would leave a judge unable to exercise the feature. The requirement's weight is on showing what was read and allowing correction, which this satisfies with no account and no network dependency beyond the one-time language-data fetch.",
+    "All money is integer paisa, converted from the fixture's decimal strings on load and formatted only for display. The DPS rule compounds monthly with half-up rounding at each step, so floating-point arithmetic would drift in the figures a judge checks. A test asserts every one of the 1,200-plus amounts across all 25 cases round-trips back to its original string.",
+    "The forecast is a flat daily run rate — spending so far divided by days elapsed, projected across the days remaining. Two months of history cannot support a seasonal or day-of-week model, and a projection that can be reproduced on a calculator is worth more than a black box, so the arithmetic is printed on screen.",
+    "The date the app treats as 'today' comes from the loaded case rather than the system clock. The published cases are dated in 2026; using the real date would place every expense in the past and make every forecast wrong.",
+    "No backend and no sign-in. P12 is a single-person ledger with no sharing, so an account would put a wall between a judge and the four requirements without changing any figure on screen. State is held in localStorage.",
+    "Insights are generated from the data rather than chosen from a list of advice. Each generator reads the month summary and returns nothing when the data does not support it, so an insight cannot appear without a real category and amount in it."
   ],
   "known_limitations": [
-    "TODO: known limitation or unfinished behaviour"
+    "The forecast applies one flat daily rate, so a large one-off charge still to come — rent, an annual fee — is only represented at the average rate and will make the projection read low. Charges already paid sit inside 'spent so far' and are not projected twice.",
+    "OCR accuracy depends on the photograph; a skewed, blurred or low-contrast receipt may misread the amount or date, which is why every field is editable and low-confidence fields are flagged. Handwritten receipts are generally not readable.",
+    "Only English-language receipt layouts are parsed. Bengali total keywords are recognised but Bengali OCR is not enabled, so a wholly Bengali receipt needs manual correction.",
+    "When the forecast surplus cannot cover every pocket, pockets are funded in the order they were created. Reordering priorities is not implemented.",
+    "The ledger lives in localStorage for one browser on one device; clearing site data removes it and it does not sync between devices.",
+    "The dashboard compares the month containing 'today' with the month before it, matching the two months the fixture supplies. Longer histories are not charted."
   ],
   "ai_tools_used": [
     {
       "tool": "Claude (Anthropic), via Claude Code",
       "used_for": "Repository scaffolding, implementation and review during the event window.",
-      "how_output_was_verified": "Code was read by the team and tested against the published fixture in sample-data/."
+      "how_output_was_verified": "Code was read by the team, checked with `npm test` (22 assertions over the published fixture and the receipt parser), and exercised in a browser against a generated receipt image to confirm the reading, review and saving path works end to end."
     }
   ],
   "licenses_file": "LICENSES.md",
