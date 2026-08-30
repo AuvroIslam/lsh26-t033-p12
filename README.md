@@ -62,7 +62,7 @@ flowchart TB
         end
 
         storage[("localStorage")]
-        ocr["Tesseract.js<br/>lazy-loaded chunk"]
+        ocr["Tesseract.js<br/>self-hosted, lazy-loaded"]
     end
 
     fixture[/"public/<br/>P12_personal_ledger_public.json"/]
@@ -71,7 +71,8 @@ flowchart TB
     store --> services
     services --> libs
     store <--> storage
-    S1 -.image.-> ocr
+    S1 -.image.-> pre["preprocess.service<br/>scale · greyscale · binarise"]
+    pre --> ocr
     ocr -.raw text.-> SV1
     SV5 -.fetch.-> fixture
 
@@ -81,6 +82,7 @@ flowchart TB
     style libs fill:#ffe49b,stroke:#2b2440,stroke-width:2px
     style storage fill:#ffcfa8,stroke:#2b2440,stroke-width:2px
     style ocr fill:#ffc9d9,stroke:#2b2440,stroke-width:2px
+    style pre fill:#ffcfa8,stroke:#2b2440,stroke-width:2px
     style fixture fill:#bcd9f7,stroke:#2b2440,stroke-width:2px
 ```
 
@@ -115,7 +117,8 @@ The requirement's weight is on the second half — the read must be **shown**, a
 
 ```mermaid
 flowchart LR
-    A["Upload or<br/>photograph a bill"] --> B["Tesseract.js<br/>in-browser OCR"]
+    A["Upload or<br/>photograph a bill"] --> P["Preprocess<br/>scale · greyscale ·<br/>adaptive binarise"]
+    P --> B["Tesseract.js<br/>in-browser OCR<br/>self-hosted"]
     B --> C["parseReceiptText<br/>amount · date · shop<br/>+ confidence + reason"]
     C --> D{"Review panel<br/>nothing saved yet"}
     D -->|"looks right"| E["Save<br/>tagged 'as read'"]
@@ -129,6 +132,7 @@ flowchart LR
     style H fill:#b8e6d4,stroke:#2b2440,stroke-width:2px
     style G fill:#ffc9d9,stroke:#2b2440,stroke-width:2px
     style M fill:#bcd9f7,stroke:#2b2440,stroke-width:2px
+    style P fill:#ffcfa8,stroke:#2b2440,stroke-width:2px
 ```
 
 Walking it:
@@ -136,7 +140,10 @@ Walking it:
 1. **Salary** is the first card. `PUB-01` loads it at `৳50,000.00`; change it and every figure on the
    other tabs follows.
 2. **Add an expense from a receipt photo** — choose any bill image, or photograph one on a phone.
-   Reading runs entirely inside the browser and takes a few seconds.
+   The image is first straightened for the engine (scaled, greyscaled, and binarised against a local
+   average so uneven lighting does not erase half the text), then read entirely inside the browser.
+   A hostile fixture — a receipt at an angle, on grey paper, under a directional light — reads
+   correctly in about two seconds.
 3. When it finishes, **nothing has been saved**. The review panel shows the uploaded image; the
    amount, date, shop and category as **editable fields**; a badge per field — **read clearly**,
    **please check** or **not found**; a note per field explaining the decision (*"read from the line
