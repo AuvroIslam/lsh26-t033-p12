@@ -11,7 +11,7 @@ Solution for **LofiStack Hackathon 2026 — P12**
 | **Team** | Logarithm |
 | **Team ID** | `LSH26-T033` |
 | **Problem** | `P12 — Personal Ledger Manager` (Tier 02) |
-| **Live application** | <!-- TODO: paste the deployed URL here before submitting --> |
+| **Live application** | **https://ledgermanager-nu.vercel.app** |
 | **Repository** | https://github.com/AuvroIslam/lsh26-t033-p12 |
 | **Demo video** | Optional link, maximum three minutes |
 
@@ -444,7 +444,7 @@ evaluated with a closed-form annuity formula, which would drift from the stated 
 git clone https://github.com/AuvroIslam/lsh26-t033-p12.git
 cd lsh26-t033-p12
 npm install
-npm run dev          # http://localhost:5173
+npm run dev          # http://localhost:5173  (or use the live URL above)
 ```
 
 ```bash
