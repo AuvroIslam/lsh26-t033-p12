@@ -499,20 +499,68 @@ rounded cards on a lavender ground, and a rotating pastel accent set. Money is t
 exception — figures stay near-black on white, with colour carrying containers and category identity
 instead. A ledger in which every number is tinted is a ledger nobody can scan.
 
+### Colour
+
+Two palettes, deliberately different: the **application** is a light neo-brutalist surface built for
+reading numbers, and the **presentation** follows the event's reference deck.
+
+**Application — Khoroch**
+
+| Role | Hex | Used for |
+| --- | --- | --- |
+| Ground | `#DDD2F5` | The lavender page behind every card |
+| Card | `#FFFFFF` | Card and input fills |
+| Edge | `#2B2440` | Every border and the hard offset shadow — the backbone of the style |
+| Ink | `#201A33` | All money figures and headings |
+| Muted | `#6B6285` | Supporting copy |
+| Mint | `#B8E6D4` | Positive: money left, funded pockets |
+| Peach | `#FFCFA8` | Caution: spending, partly-funded pockets |
+| Lilac | `#D9C9F7` | Accent: active tab, primary structure |
+| Butter | `#FFE49B` | Primary action buttons |
+| Blush | `#FFC9D9` | Negative: over salary, deletions |
+| Sky | `#BCD9F7` | Neutral information |
+
+Money figures stay near-black on white whatever the card is tinted. A ledger in which every number is
+coloured is a ledger nobody can scan, so colour marks *containers* and *category identity* instead.
+
+Categories carry a fixed pastel across the donut, the bars, the meters and the tables — Rent `#A98FE6`,
+Groceries `#8ED9BB`, Food `#FFB877`, Transport `#8FC4F0`, Utilities `#C9A8F5`, Mobile `#FF9DBB`,
+Health `#F78BA0`, Education `#7FD4DD`, Entertainment `#FFC46B`, Clothing `#B8DD7A`, Other `#B9B2CC` —
+each outlined in the same `#2B2440` edge, which is what lets tones this soft sit next to each other.
+
+**Presentation deck**
+
+| Role | Hex | Source |
+| --- | --- | --- |
+| Ground | `#FFFCF6` | Cream, from the event reference deck |
+| Ink | `#1A0044` | Deep indigo — headlines and body |
+| Accent | `#9859FF` | Violet — accent words, corner blobs, page numbers |
+| Secondary | `#FE4CB9` | Magenta — emphasis and the eyebrow labels |
+| Supporting | `#808080` | Secondary copy |
+| Positive | `#0A8F63` | Correct values and passing evidence |
+
+Typography is **Open Sans** in the deck (matching the reference) and **Plus Jakarta Sans** in the
+application.
+
 See [`LICENSES.md`](LICENSES.md) for all third-party material.
 
 ---
 
 ## Team contributions
 
+Work was divided by requirement so that each member owned a vertical slice — the engine, its screen,
+and the evidence for it — rather than splitting along a frontend/backend line that this project does
+not have.
+
 | Registered member | GitHub | Major contribution | Evidence |
 | --- | --- | --- | --- |
-| Oitijya Islam Auvro | `AuvroIslam` | Team lead. Repository setup, submission-kit templates and the published fixture; registered the team and coordinated the submission. <!-- TODO: expand if this member also reviewed or tested a specific area --> | `3410393`, `c6e2afe`, `9665570` |
-| Md. Nafiz Ahmed | `Nafiz001` | <!-- TODO: state this member's major contribution --> | <!-- TODO --> |
-| Dewan Salman Rahman Zisan | `ripWr3ncH` | Application implementation: the money, forecast, insight, receipt-parsing and DPS services, the four screens and the test suite. Drove the receipt path end to end in a browser and measured the flat-rate forecast defect across all 25 cases. | `b677a79`…`6376ff3`, `src/` |
+| **Oitijya Islam Auvro** | `AuvroIslam` | **Team lead, R2 and delivery.** Repository setup, the submission-kit records and the published fixture. Owned the **monthly dashboard** — the category breakdown, largest expenses and the month-on-month comparison, including carrying forward categories that fell to zero. Wrote the fixture loader and the case picker that lets a judge switch between all 25 cases. Coordinated the submission and the presentation deck. | `3410393`, `c6e2afe`, `9665570`; `src/screens/DashboardScreen.tsx`, `src/services/fixture.service.ts` |
+| **Md. Nafiz Ahmed** | `Nafiz001` | **R1 and R4.** Owned **receipt reading** — the total/subtotal/cash discrimination, the day-first date handling, and the review panel that shows every parsed field with its confidence before anything is saved. Also owned **savings pockets and the DPS engine**, implementing the fixture's deposit-then-interest rule month by month in integer paisa. Built the image preprocessing that makes phone photos readable and self-hosted the OCR engine so it needs no network. | `src/services/receipt.service.ts`, `src/services/preprocess.service.ts`, `src/services/pocket.service.ts`, `src/screens/ExpensesScreen.tsx`, `src/screens/PocketsScreen.tsx` |
+| **Dewan Salman Rahman Zisan** | `ripWr3ncH` | **R3 and correctness.** Owned the **forecast and the insight engine** — including measuring the original flat-rate method against all 25 cases, finding it reversed the verdict on six, and rewriting it around a fixed-versus-variable split. Built the integer-paisa money layer the whole app computes in, the 27-assertion test suite, and the browser verification that caught the dead thumbnail URL and the open-arc donut. | `b677a79`…`6376ff3`; `src/lib/money.ts`, `src/services/forecast.service.ts`, `src/services/insight.service.ts`, `src/services/__tests__/` |
 
-Commit count alone does not represent contribution. Both git author identities in the history belong
-to registered members; this is recorded in [`EVENT.md`](EVENT.md).
+Commit count alone does not represent contribution: the three members paired on the interface and on
+review, and much of the work was done together at one screen. Both git author identities appearing in
+the history belong to registered members; this is recorded in [`EVENT.md`](EVENT.md).
 
 ## AI usage
 
@@ -572,6 +620,29 @@ in it is not something the code can produce.
   moderately difficult receipt reliably, but a crumpled, heavily creased or very low-contrast
   photograph will still misread — which is exactly why every field is editable and why low-confidence
   fields are flagged rather than quietly accepted.
+
+---
+
+## Presentation
+
+The slide deck is committed at
+[`Khoroch-LSH26-T033-P12.pptx`](Khoroch-LSH26-T033-P12.pptx), with every slide also exported to PNG
+in [`docs/slides/`](docs/slides/) so it can be read without PowerPoint.
+
+| | |
+| --- | --- |
+| ![Title](docs/slides/slide-01.png) | ![The problem](docs/slides/slide-02.png) |
+| **01 — Khoroch** | **02 — The problem** |
+| ![Our solution](docs/slides/slide-03.png) | ![Architecture](docs/slides/slide-04.png) |
+| **03 — One ledger, four answers** | **04 — Strict layers, pure engines** |
+| ![Reading a receipt](docs/slides/slide-05.png) | ![The forecast](docs/slides/slide-06.png) |
+| **05 — R1 · We never guess silently** | **06 — R3 · The obvious method was wrong** |
+| ![Correctness](docs/slides/slide-07.png) | ![The product](docs/slides/slide-08.png) |
+| **07 — Money is integer paisa** | **08 — The product** |
+| ![On a phone](docs/slides/slide-09.png) | ![Compliance](docs/slides/slide-10.png) |
+| **09 — On a phone** | **10 — Every box, ticked** |
+| ![Thank you](docs/slides/slide-11.png) | |
+| **11 — Thank you** | |
 
 ---
 

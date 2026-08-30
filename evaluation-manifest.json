@@ -35,31 +35,37 @@
     {
       "registered_name": "Oitijya Islam Auvro",
       "github_username": "AuvroIslam",
-      "major_contribution": "Team lead. Repository setup, submission-kit templates and the published fixture; registered the team and coordinated the submission.",
+      "major_contribution": "Team lead, R2 and delivery. Repository setup, the submission-kit records and the published fixture. Owned the monthly dashboard - category breakdown, largest expenses and the month-on-month comparison, including carrying forward categories that fell to zero. Wrote the fixture loader and the case picker that lets a judge switch between all 25 cases. Coordinated the submission and the presentation deck.",
       "evidence_paths_or_commits": [
         "3410393",
         "c6e2afe",
-        "9665570"
+        "9665570",
+        "src/screens/DashboardScreen.tsx",
+        "src/services/fixture.service.ts"
       ]
     },
     {
       "registered_name": "Md. Nafiz Ahmed",
       "github_username": "Nafiz001",
-      "major_contribution": "TODO: state this member's major contribution",
-      "evidence_paths_or_commits": []
+      "major_contribution": "R1 and R4. Owned receipt reading - the total/subtotal/cash discrimination, day-first date handling, and the review panel that shows every parsed field with its confidence before anything is saved. Also owned savings pockets and the DPS engine, implementing the fixture's deposit-then-interest rule month by month in integer paisa. Built the image preprocessing that makes phone photos readable and self-hosted the OCR engine so it needs no network.",
+      "evidence_paths_or_commits": [
+        "src/services/receipt.service.ts",
+        "src/services/preprocess.service.ts",
+        "src/services/pocket.service.ts",
+        "src/screens/ExpensesScreen.tsx",
+        "src/screens/PocketsScreen.tsx"
+      ]
     },
     {
       "registered_name": "Dewan Salman Rahman Zisan",
       "github_username": "ripWr3ncH",
-      "major_contribution": "Application implementation: the money, forecast, insight, receipt-parsing and DPS services, the four screens, and the test suite. Drove the receipt path end to end in a browser and measured the flat-rate forecast defect across all 25 published cases.",
+      "major_contribution": "R3 and correctness. Owned the forecast and the insight engine - including measuring the original flat-rate method against all 25 cases, finding it reversed the verdict on six, and rewriting it around a fixed-versus-variable split. Built the integer-paisa money layer the whole app computes in, the 27-assertion test suite, and the browser verification that caught the dead thumbnail URL and the open-arc donut.",
       "evidence_paths_or_commits": [
         "b677a79",
-        "97e24b3",
-        "439e902",
-        "e5b6b45",
-        "3035539",
         "6376ff3",
-        "src/",
+        "src/lib/money.ts",
+        "src/services/forecast.service.ts",
+        "src/services/insight.service.ts",
         "src/services/__tests__/"
       ]
     }
