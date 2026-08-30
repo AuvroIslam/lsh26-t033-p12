@@ -1,6 +1,63 @@
 {
-  "_PLACEHOLDER": "REPLACE THIS ENTIRE FILE with the evaluation-manifest.json template from the participant pack in the arena, then complete it. This stub is NOT the official schema.",
   "team_id": "LSH26-T033",
   "problem_id": "P12",
-  "repository": "lsh26-t033-p12"
+  "repository_name": "lsh26-t033-p12",
+  "live_url": "TODO: deployed URL",
+  "demo_video_url_optional": "",
+  "event_start_code": "LSH26-8490-C900",
+  "repository_created_before_release": false,
+  "pre_event_materials": [],
+  "sample_data": {
+    "loads_published_fixture": true,
+    "method": "TODO: file upload / paste JSON / manual entry",
+    "reset_instructions": "TODO: explain how judges restore the initial data."
+  },
+  "problem_solving_method": "TODO: briefly explain the approach and why the team chose it.",
+  "requirements": {
+    "R1": {
+      "status": "not_attempted",
+      "evidence": "Set a monthly salary; add expenses including by bill photo; show what was read and allow correction before saving"
+    },
+    "R2": {
+      "status": "not_attempted",
+      "evidence": "Monthly dashboard: total spent against salary, category breakdown, largest expenses, change vs last month"
+    },
+    "R3": {
+      "status": "not_attempted",
+      "evidence": "Forecast and written insights from actual numbers, with at least three insights naming specific categories and amounts"
+    },
+    "R4": {
+      "status": "not_attempted",
+      "evidence": "Savings pockets with expected completion date from the forecast and DPS return at a stated rate"
+    }
+  },
+  "team_members": [
+    {
+      "registered_name": "Oitijya Islam Auvro",
+      "github_username": "AuvroIslam",
+      "major_contribution": "TODO",
+      "evidence_paths_or_commits": []
+    },
+    {
+      "registered_name": "TODO: member name",
+      "github_username": "TODO",
+      "major_contribution": "TODO",
+      "evidence_paths_or_commits": []
+    }
+  ],
+  "major_design_decisions": [
+    "TODO: decision and short reason"
+  ],
+  "known_limitations": [
+    "TODO: known limitation or unfinished behaviour"
+  ],
+  "ai_tools_used": [
+    {
+      "tool": "Claude (Anthropic), via Claude Code",
+      "used_for": "Repository scaffolding, implementation and review during the event window.",
+      "how_output_was_verified": "Code was read by the team and tested against the published fixture in sample-data/."
+    }
+  ],
+  "licenses_file": "LICENSES.md",
+  "declaration": "The information above is complete and truthful to the best of the team's knowledge."
 }

@@ -1,38 +1,17 @@
-# Third-party material
+# Third-Party Material and AI Disclosure
 
-Every framework, library, starter, template, UI kit, font, icon and asset used in
-`lsh26-t033-p12`, with its licence.
+List material frameworks, libraries, starters, templates, UI kits, fonts, icons and assets used in this repository.
 
-## Frameworks and libraries
-
-| Name | Version | Licence | Used for |
+| Name | Version or source URL | Licence | Used for |
 |---|---|---|---|
-| TODO | TODO | TODO | TODO |
+|  |  |  |  |
 
-## Starters, templates and UI kits
+## AI tools
 
-| Name | Source | Licence | What was taken |
-|---|---|---|---|
-| None | N/A | N/A | N/A |
+- **Claude (Anthropic), via Claude Code** — repository scaffolding, implementation and review during
+  the event window. Verified by reading the code and testing it against the published fixture
+  committed in `sample-data/`. Also recorded in `evaluation-manifest.json`.
 
-## Fonts
+## Original-work statement
 
-| Name | Source | Licence |
-|---|---|---|
-| TODO | TODO | TODO |
-
-## Icons and assets
-
-| Name | Source | Licence |
-|---|---|---|
-| TODO | TODO | TODO |
-
-## Sample data
-
-The public sample data in `sample-data/` was supplied by the organisers as part of the
-LofiStack Hackathon 2026 problem set.
-
-## AI assistance
-
-Claude (Anthropic) was used during the event for scaffolding, implementation and review.
-All output was directed, reviewed and accepted by the team; the work remains the team's own.
+Everything not declared in this file or `EVENT.md` was created by the registered team during the event window.
