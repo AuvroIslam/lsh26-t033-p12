@@ -185,18 +185,17 @@ function findDate(text: string): { value: string | null; confidence: number; not
     const a = Number(numMatch[1]);
     const b = Number(numMatch[2]);
     const year = expandYear(numMatch[3]);
-    // If the first part cannot be a month, the order is certain.
-    if (a > 12) {
-      const v = iso(year, b, a);
-      if (v) return { value: v, confidence: 0.9, note: 'day-first date (first part is above 12)' };
-    }
     const v = iso(year, b, a);
     if (v) {
-      return {
-        value: v,
-        confidence: 0.6,
-        note: 'ambiguous date, read day-first as is usual in Bangladesh — please confirm',
-      };
+      // A first part above 12 cannot be a month, so the order is certain.
+      // Otherwise the reading is a convention, and the user is told so.
+      return a > 12
+        ? { value: v, confidence: 0.9, note: 'day-first date (the first part is above 12)' }
+        : {
+            value: v,
+            confidence: 0.6,
+            note: 'ambiguous date, read day-first as is usual in Bangladesh — please confirm',
+          };
     }
   }
 

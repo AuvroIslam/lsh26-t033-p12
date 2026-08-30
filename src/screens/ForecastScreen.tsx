@@ -17,7 +17,7 @@ import {
 } from 'recharts';
 import { Badge, Card, EmptyState, Stat } from '../components/ui';
 import { compactMoney, displayMoney } from '../lib/money';
-import { monthLabel, monthOf, prevMonth } from '../lib/dates';
+import { addMonths, monthLabel, monthOf, prevMonth } from '../lib/dates';
 import { buildForecast, buildMonthSummary, expensesInMonth } from '../services/forecast.service';
 import { buildInsights, type Insight } from '../services/insight.service';
 import { useLedger } from '../store/ledger.store';
@@ -101,7 +101,7 @@ export default function ForecastScreen() {
           sub={
             forecast.projectedShort
               ? `Spending ${displayMoney(forecast.safeDailyBudget)} a day or less breaks even`
-              : `Free to save or carry into ${monthLabel(monthOf(state.today))}`
+              : `Free to save or carry into ${monthLabel(addMonths(monthOf(state.today), 1))}`
           }
         />
       </div>
@@ -182,13 +182,13 @@ export default function ForecastScreen() {
           </p>
           <p className="tabular mt-1.5 text-[13px] leading-relaxed text-ink-800">
             Daily rate = {displayMoney(summary.totalSpent)} spent ÷ {forecast.daysElapsed} days elapsed
-            = <strong>{displayMoney(forecast.dailyRate)}</strong> a day.
+            {' '}= <strong>{displayMoney(forecast.dailyRate)}</strong> a day.
             <br />
             Rest of month = {displayMoney(forecast.dailyRate)} × {forecast.daysRemaining} days remaining
-            = <strong>{displayMoney(forecast.restOfMonth)}</strong>.
+            {' '}= <strong>{displayMoney(forecast.restOfMonth)}</strong>.
             <br />
             Projected total = {displayMoney(summary.totalSpent)} + {displayMoney(forecast.restOfMonth)}
-            = <strong>{displayMoney(forecast.projectedTotal)}</strong>.
+            {' '}= <strong>{displayMoney(forecast.projectedTotal)}</strong>.
             <br />
             Projected {forecast.projectedShort ? 'shortfall' : 'money left'} ={' '}
             {displayMoney(summary.salary)} − {displayMoney(forecast.projectedTotal)} ={' '}
