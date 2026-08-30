@@ -1,0 +1,64 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink-950: #071410;
+  --color-ink-900: #0c1f19;
+  --color-ink-800: #123028;
+  --color-ink-700: #1b4438;
+  --color-brand-600: #08584a;
+  --color-brand-500: #0b7a66;
+  --color-brand-400: #14a184;
+  --color-brand-300: #50cdb7;
+  --color-brand-200: #9ae6d5;
+  --color-brand-50: #ecfdf7;
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+:root {
+  color-scheme: light;
+  --surface: #f6f8f7;
+  --card: #ffffff;
+  --border: #e2e8e5;
+  --text: #0c1f19;
+  --muted: #5d6f69;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Numbers in tables and money readouts must line up column to column. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.28s ease-out both;
+}
+
+/* Focus ring that stays visible on both the light surface and the brand fill. */
+:where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
