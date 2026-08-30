@@ -613,19 +613,22 @@ See [`LICENSES.md`](LICENSES.md) for all third-party material.
 
 ## Team contributions
 
-Work was divided by requirement so that each member owned a vertical slice — the engine, its screen,
-and the evidence for it — rather than splitting along a frontend/backend line that this project does
-not have.
+One member implemented the application end to end; the other two contributed to the architecture and
+the concept, the submission records and the demo video. The table below states what each member did
+and what in the repository evidences it.
 
 | Registered member | GitHub | Major contribution | Evidence |
 | --- | --- | --- | --- |
-| **Oitijya Islam Auvro** | `AuvroIslam` | **Team lead, R2 and delivery.** Repository setup, the submission-kit records and the published fixture. Owned the **monthly dashboard** — the category breakdown, largest expenses and the month-on-month comparison, including carrying forward categories that fell to zero. Wrote the fixture loader and the case picker that lets a judge switch between all 25 cases. Coordinated the submission and the presentation deck. | `3410393`, `c6e2afe`, `9665570`; `src/screens/DashboardScreen.tsx`, `src/services/fixture.service.ts` |
-| **Md. Nafiz Ahmed** | `Nafiz001` | **R1 and R4.** Owned **receipt reading** — the total/subtotal/cash discrimination, the day-first date handling, and the review panel that shows every parsed field with its confidence before anything is saved. Also owned **savings pockets and the DPS engine**, implementing the fixture's deposit-then-interest rule month by month in integer paisa. Built the image preprocessing that makes phone photos readable and self-hosted the OCR engine so it needs no network. | `src/services/receipt.service.ts`, `src/services/preprocess.service.ts`, `src/services/pocket.service.ts`, `src/screens/ExpensesScreen.tsx`, `src/screens/PocketsScreen.tsx` |
-| **Dewan Salman Rahman Zisan** | `ripWr3ncH` | **R3 and correctness.** Owned the **forecast and the insight engine** — including measuring the original flat-rate method against all 25 cases, finding it reversed the verdict on six, and rewriting it around a fixed-versus-variable split. Built the integer-paisa money layer the whole app computes in, the 27-assertion test suite, and the browser verification that caught the dead thumbnail URL and the open-arc donut. | `b677a79`…`6376ff3`; `src/lib/money.ts`, `src/services/forecast.service.ts`, `src/services/insight.service.ts`, `src/services/__tests__/` |
+| **Oitijya Islam Auvro** | `AuvroIslam` | **Team lead, system architecture and idea generation.** Shaped how the problem was approached and how the solution was structured — the split into pure domain services with the interface around them — and which features the team pursued. Set up the repository and committed the submission-kit records and the published fixture. Coordinated the submission and the presentation deck. Wrote no application code. | `3410393`, `c6e2afe`, `9665570` — submission paperwork and the committed fixture |
+| **Md. Nafiz Ahmed** | `Nafiz001` | **Concept and demo video.** Contributed to idea generation — shaping how the problem was approached and which features the team pursued — and produced the demo video, including filming and editing. Wrote no code and authored no commits. | No commits; contribution is not in the repository |
+| **Dewan Salman Rahman Zisan** | `ripWr3ncH` | **Implemented the application in full — R1 through R4.** Wrote every file under `src/`: the receipt OCR path, the image preprocessing and self-hosted engine, the monthly dashboard, the **forecast and insight engines** — including measuring the original flat-rate method against all 25 cases, finding it reversed the verdict on six, and rewriting it around a fixed-versus-variable split — the savings pockets and DPS engine, the fixture loader and case picker, the integer-paisa money layer, the 27-assertion test suite, and the browser verification that caught the dead thumbnail URL and the open-arc donut. | 21 of 24 commits, `b677a79`…`3ec89f1`; all of `src/` |
 
-Commit count alone does not represent contribution: the three members paired on the interface and on
-review, and much of the work was done together at one screen. Both git author identities appearing in
-the history belong to registered members; this is recorded in [`EVENT.md`](EVENT.md).
+The contributions above are deliberately uneven, and the history shows it. All of the application
+code was written by one member: 21 of the 24 commits are `ripWr3ncH`, and every file under `src/` is
+his. The remaining 3 are `AuvroIslam` and touch submission paperwork and the committed fixture only.
+`Nafiz001` authored no commits — that contribution was to the concept and the demo video, and is not
+in the repository. Both git author identities appearing in the history belong to registered members;
+this is recorded in [`EVENT.md`](EVENT.md).
 
 ## AI usage
 
