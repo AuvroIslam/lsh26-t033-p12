@@ -84,7 +84,8 @@ See [`LICENSES.md`](LICENSES.md) for third-party materials.
 | Registered member | GitHub username | Major contribution | Evidence |
 | --- | --- | --- | --- |
 | Oitijya Islam Auvro | `AuvroIslam` | <!-- TODO --> | <!-- TODO --> |
-| <!-- TODO: member --> | <!-- TODO --> | <!-- TODO --> | <!-- TODO --> |
+| Md. Nafiz Ahmed | `Nafiz001` | <!-- TODO --> | <!-- TODO --> |
+| Dewan Salman Rahman Zisan | `ripWr3ncH` | <!-- TODO --> | <!-- TODO --> |
 
 Commit count alone does not represent contribution.
 
