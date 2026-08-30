@@ -13,6 +13,7 @@ Solution for **LofiStack Hackathon 2026 — P12**
 | **Problem** | `P12 — Personal Ledger Manager` (Tier 02) |
 | **Live application** | **https://ledgermanager-nu.vercel.app** |
 | **Repository** | https://github.com/AuvroIslam/lsh26-t033-p12 |
+| **Presentation** | [Google Slides](https://docs.google.com/presentation/d/1E7_2R2ad9jGIeDMX_6c87sshousBednz/edit?usp=sharing) · also committed as [`Khoroch-LSH26-T033-P12.pptx`](Khoroch-LSH26-T033-P12.pptx) |
 | **Demo video** | Optional link, maximum three minutes |
 
 > Judges will evaluate only the exact commit SHA entered in the Final Submission Form.
@@ -695,7 +696,7 @@ in it is not something the code can produce.
 | [`evaluation-manifest.json`](evaluation-manifest.json) | Structured judging evidence |
 | [`LICENSES.md`](LICENSES.md) | Every framework, library, font and asset used |
 | [`sample-data/`](sample-data/) | The published fixture, unmodified |
-| [`Khoroch-LSH26-T033-P12.pptx`](Khoroch-LSH26-T033-P12.pptx) | The presentation deck, also exported to [`docs/slides/`](docs/slides/) |
+| [`Khoroch-LSH26-T033-P12.pptx`](Khoroch-LSH26-T033-P12.pptx) | The presentation deck, exported to [`docs/slides/`](docs/slides/) and viewable as [Google Slides](https://docs.google.com/presentation/d/1E7_2R2ad9jGIeDMX_6c87sshousBednz/edit?usp=sharing) |
 
 ---
 
