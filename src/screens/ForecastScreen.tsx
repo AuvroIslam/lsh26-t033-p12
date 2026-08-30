@@ -79,6 +79,7 @@ export default function ForecastScreen() {
     <div className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
+          accent="sky"
           label="Day-to-day rate"
           value={displayMoney(forecast.dailyRate)}
           sub={
@@ -88,17 +89,20 @@ export default function ForecastScreen() {
           }
         />
         <Stat
+          accent="butter"
           label="Expected rest of month"
           value={displayMoney(forecast.restOfMonth)}
           sub={`${forecast.daysRemaining} days left at the current rate`}
         />
         <Stat
+          accent="peach"
           label="Projected month total"
           value={displayMoney(forecast.projectedTotal)}
           tone={forecast.projectedShort ? 'bad' : 'neutral'}
           sub={`Against a salary of ${displayMoney(summary.salary)}`}
         />
         <Stat
+          accent={forecast.projectedShort ? 'blush' : 'mint'}
           label={forecast.projectedShort ? 'Projected short' : 'Projected left'}
           value={displayMoney(Math.abs(forecast.projectedRemaining))}
           tone={forecast.projectedShort ? 'bad' : 'good'}
@@ -111,6 +115,7 @@ export default function ForecastScreen() {
       </div>
 
       <Card
+        accent="lilac"
         title={`Spending path through ${monthLabel(thisMonth)}`}
         subtitle="Solid to today, projected after it, against the salary line"
       >
@@ -119,20 +124,20 @@ export default function ForecastScreen() {
             <AreaChart data={chart} margin={{ top: 4, right: 12, bottom: 4, left: 4 }}>
               <defs>
                 <linearGradient id="actualFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#14a184" stopOpacity={0.28} />
-                  <stop offset="100%" stopColor="#14a184" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="#a98fe6" stopOpacity={0.28} />
+                  <stop offset="100%" stopColor="#a98fe6" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#eef2f0" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(43,36,64,0.12)" vertical={false} />
               <XAxis
                 dataKey="day"
-                tick={{ fontSize: 11, fill: '#5d6f69' }}
+                tick={{ fontSize: 11, fill: '#6b6285' }}
                 axisLine={false}
                 tickLine={false}
                 interval={Math.floor(summary.daysInMonth / 10)}
               />
               <YAxis
-                tick={{ fontSize: 11, fill: '#5d6f69' }}
+                tick={{ fontSize: 11, fill: '#6b6285' }}
                 axisLine={false}
                 tickLine={false}
                 width={56}
@@ -148,19 +153,19 @@ export default function ForecastScreen() {
               />
               <ReferenceLine
                 y={summary.salary / 100}
-                stroke="#ef4444"
+                stroke="#d1436f"
                 strokeDasharray="5 4"
                 label={{
                   value: `Salary ${compactMoney(summary.salary)}`,
                   fontSize: 11,
-                  fill: '#ef4444',
+                  fill: '#d1436f',
                   position: 'insideTopRight',
                 }}
               />
               <Area
                 type="monotone"
                 dataKey="projected"
-                stroke="#94a3b8"
+                stroke="#8f87a5"
                 strokeDasharray="5 4"
                 strokeWidth={2}
                 fill="none"
@@ -170,7 +175,7 @@ export default function ForecastScreen() {
               <Area
                 type="monotone"
                 dataKey="actual"
-                stroke="#0b7a66"
+                stroke="#7b4fd4"
                 strokeWidth={2.5}
                 fill="url(#actualFill)"
                 dot={false}
@@ -180,11 +185,11 @@ export default function ForecastScreen() {
         </div>
 
         {/* The method, in the open. */}
-        <div className="border-t border-[var(--border)] bg-slate-50/60 px-5 py-4">
+        <div className="border-t border-[var(--edge)] bg-[var(--card-sunk)] px-5 py-4">
           <p className="text-[12px] font-semibold tracking-wide text-[var(--muted)] uppercase">
             How the forecast is calculated
           </p>
-          <p className="tabular mt-1.5 text-[13px] leading-relaxed text-ink-800">
+          <p className="tabular mt-1.5 text-[13px] leading-relaxed text-[var(--text)]">
             {forecast.fixedPaid > 0 && (
               <>
                 Recurring fixed charges are held out of the daily rate, so a charge that
@@ -208,7 +213,7 @@ export default function ForecastScreen() {
             <br />
             Projected {forecast.projectedShort ? 'shortfall' : 'money left'} ={' '}
             {displayMoney(summary.salary)} − {displayMoney(forecast.projectedTotal)} ={' '}
-            <strong className={forecast.projectedShort ? 'text-rose-600' : 'text-emerald-700'}>
+            <strong className={forecast.projectedShort ? 'text-blush-ink' : 'text-mint-ink'}>
               {displayMoney(forecast.projectedRemaining)}
             </strong>
             .
@@ -227,10 +232,11 @@ export default function ForecastScreen() {
       </Card>
 
       <Card
+        accent="mint"
         title="What the numbers say"
         subtitle={`${insights.length} insights, each drawn from your own figures and ordered by how much money is involved`}
       >
-        <ul className="divide-y divide-[var(--border)]">
+        <ul className="divide-y divide-[var(--edge)]/15">
           {insights.map((ins) => (
             <InsightRow key={ins.id} insight={ins} />
           ))}
@@ -254,7 +260,7 @@ function InsightRow({ insight }: { insight: Insight }) {
       <span className={`mt-1 w-1 shrink-0 rounded-full ${t.bar}`} />
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 className="text-[14px] font-semibold text-ink-900">{insight.title}</h3>
+          <h3 className="text-[14px] font-semibold text-[var(--text)]">{insight.title}</h3>
           <Badge tone={t.badge}>{t.label}</Badge>
         </div>
         <p className="mt-1 text-[13px] leading-relaxed text-[var(--muted)]">{insight.body}</p>

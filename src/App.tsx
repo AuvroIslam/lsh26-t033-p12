@@ -48,7 +48,8 @@ export default function App() {
 
   if (!hydrated) {
     return (
-      <div className="grid min-h-screen place-items-center text-sm text-[var(--muted)]">
+      <div className="grid min-h-screen place-items-center gap-3 text-sm text-[var(--muted)]">
+        <span className="size-8 animate-spin rounded-full border-[3px] border-[var(--edge)]/20 border-t-[var(--edge)]" />
         Loading the ledger…
       </div>
     );
@@ -56,19 +57,19 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-[var(--card)]/95 backdrop-blur">
-        <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
+      <header className="sticky top-0 z-20 border-b-2 border-[var(--edge)] bg-[var(--surface)]/95 backdrop-blur-md">
+        <div className="mx-auto max-w-6xl px-4 py-3.5 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-brand-600 text-[15px] font-black text-white">
+            <div className="flex items-center gap-3">
+              <span className="nb-sm grid size-11 shrink-0 place-items-center rounded-2xl bg-butter text-[19px] font-black text-[var(--text)]">
                 ৳
               </span>
               <div>
-                <h1 className="text-[15px] leading-tight font-bold text-ink-900">
-                  Personal Ledger Manager
+                <h1 className="text-[17px] leading-tight font-extrabold tracking-tight text-[var(--text)]">
+                  Khoroch
                 </h1>
-                <p className="text-[12px] leading-tight text-[var(--muted)]">
-                  LSH26-T033 · P12 · Team Logarithm
+                <p className="text-[12px] leading-tight font-medium text-[var(--text)]/65">
+                  Personal ledger · LSH26-T033 · P12
                 </p>
               </div>
             </div>
@@ -80,7 +81,7 @@ export default function App() {
                 value={caseId ?? ''}
                 onChange={(e) => void onPickCase(e.target.value)}
                 disabled={loadingCase || cases.length === 0}
-                className="rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-[13px] font-medium text-ink-900 outline-none focus:border-brand-400 disabled:opacity-50"
+                className="nb-sm rounded-full bg-[var(--card)] px-3.5 py-2 text-[13px] font-bold text-[var(--text)] outline-none disabled:opacity-45"
                 aria-label="Load a published sample case"
               >
                 <option value="">
@@ -99,41 +100,43 @@ export default function App() {
           </div>
 
           {/* Context strip: what the app currently treats as "today" and why. */}
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[var(--muted)]">
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] font-medium text-[var(--text)]/70">
             {caseId ? (
               <Badge tone="brand">sample case {caseId}</Badge>
             ) : (
               <Badge tone="neutral">manual entry</Badge>
             )}
             <span>
-              Today: <strong className="font-semibold text-ink-800">{dateLabel(today)}</strong>
+              Today: <strong className="font-extrabold text-[var(--text)]">{dateLabel(today)}</strong>
             </span>
             <span>
-              Month: <strong className="font-semibold text-ink-800">{monthLabel(monthOf(today))}</strong>
+              Month: <strong className="font-extrabold text-[var(--text)]">{monthLabel(monthOf(today))}</strong>
             </span>
             <span>
-              Salary: <strong className="tabular font-semibold text-ink-800">{displayMoney(salary)}</strong>
+              Salary: <strong className="tabular font-extrabold text-[var(--text)]">{displayMoney(salary)}</strong>
             </span>
             <span>
-              <strong className="tabular font-semibold text-ink-800">{expenses.length}</strong> expenses
+              <strong className="tabular font-extrabold text-[var(--text)]">{expenses.length}</strong> expenses
             </span>
           </div>
 
-          <nav className="mt-3 flex gap-1 overflow-x-auto">
+          <nav className="mt-3.5 flex gap-2 overflow-x-auto pb-1">
             {TABS.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-semibold transition-colors ${
+                className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-[13px] font-bold transition-all duration-150 ${
                   tab === t.id
-                    ? 'bg-brand-600 text-white'
-                    : 'text-ink-800 hover:bg-brand-50'
+                    ? 'nb-sm nb-press bg-lilac text-lilac-ink'
+                    : 'border-2 border-transparent text-[var(--text)]/70 hover:bg-white/55 hover:text-[var(--text)]'
                 }`}
               >
                 {t.label}
                 <span
                   className={`rounded px-1 py-px text-[10px] font-bold ${
-                    tab === t.id ? 'bg-white/20 text-white' : 'bg-slate-100 text-[var(--muted)]'
+                    tab === t.id
+                      ? 'bg-white/70 text-lilac-ink'
+                      : 'bg-white/50 text-[var(--text)]/55'
                   }`}
                 >
                   {t.req}
@@ -146,7 +149,7 @@ export default function App() {
 
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
         {error && (
-          <p className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] text-rose-700">
+          <p className="nb mb-4 rounded-2xl bg-blush px-4 py-3 text-[13px] font-bold text-blush-ink">
             {error}
           </p>
         )}
@@ -158,10 +161,10 @@ export default function App() {
         </div>
       </main>
 
-      <footer className="mx-auto max-w-6xl px-4 pb-10 text-[12px] leading-relaxed text-[var(--muted)] sm:px-6">
-        Amounts are held as integer paisa and shown in BDT. The forecast projects the
-        current daily spending rate across the days left in the month; the DPS figures follow the
-        deposit-then-interest rule stated in the published sample data.
+      <footer className="mx-auto max-w-6xl px-4 py-8 text-[12px] leading-relaxed font-medium text-[var(--text)]/55 sm:px-6">
+        Khoroch · amounts are held as integer paisa and shown in BDT. The forecast holds recurring
+        fixed charges out of the daily rate before projecting it across the days left in the month;
+        the DPS figures follow the deposit-then-interest rule stated in the published sample data.
       </footer>
     </div>
   );

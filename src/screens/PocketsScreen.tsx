@@ -63,16 +63,19 @@ export default function PocketsScreen() {
     <div className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
+          accent="lilac"
           label="Pockets"
           value={String(state.pockets.length)}
           sub={`${displayMoney(state.pockets.reduce((s, p) => s + p.target, 0))} of targets in total`}
         />
         <Stat
+          accent="peach"
           label="Committed monthly"
           value={displayMoney(totalCommitted)}
           sub="The sum of every monthly contribution"
         />
         <Stat
+          accent={surplus >= 0 ? 'mint' : 'blush'}
           label="Forecast leaves"
           value={displayMoney(Math.abs(surplus))}
           tone={surplus >= 0 ? 'good' : 'bad'}
@@ -83,6 +86,7 @@ export default function PocketsScreen() {
           }
         />
         <Stat
+          accent="butter"
           label="DPS rate"
           value={`${state.dpsAnnualRatePercent.toFixed(2)}% a year`}
           tone="brand"
@@ -95,11 +99,11 @@ export default function PocketsScreen() {
         <div
           className={`rounded-2xl border px-5 py-4 ${
             totalCommitted <= surplus
-              ? 'border-emerald-200 bg-emerald-50'
-              : 'border-amber-200 bg-amber-50'
+              ? 'nb bg-mint'
+              : 'nb bg-peach'
           }`}
         >
-          <p className="text-[13px] leading-relaxed text-ink-900">
+          <p className="text-[13px] leading-relaxed text-[var(--text)]">
             {totalCommitted <= surplus ? (
               <>
                 Your pockets ask for <strong>{displayMoney(totalCommitted)}</strong> a month and the
@@ -145,7 +149,7 @@ export default function PocketsScreen() {
         </div>
       )}
 
-      <Card title="Create a savings pocket" subtitle="A target, and what you can put aside each month.">
+      <Card accent="mint" title="Create a savings pocket" subtitle="A target, and what you can put aside each month.">
         <div className="grid gap-3 px-5 py-5 sm:grid-cols-2 lg:grid-cols-5 lg:items-end">
           <Field label="Name">
             <Input
@@ -187,6 +191,7 @@ export default function PocketsScreen() {
       </Card>
 
       <Card
+        accent="butter"
         title="DPS rate"
         subtitle="The rate every DPS projection on this page is calculated at."
       >
@@ -205,7 +210,7 @@ export default function PocketsScreen() {
               </Field>
             </div>
             <p className="max-w-xl pb-2.5 text-[12px] leading-relaxed text-[var(--muted)]">
-              Stated rate: <strong className="text-ink-900">{state.dpsAnnualRatePercent.toFixed(2)}% a year</strong>,
+              Stated rate: <strong className="text-[var(--text)]">{state.dpsAnnualRatePercent.toFixed(2)}% a year</strong>,
               compounded monthly. Each month the deposit is added to the balance first, then interest of
               balance × rate ÷ 12 ÷ 100 is calculated, rounded half up to the paisa, and added — so
               later months earn interest on the interest already credited. This is the rule published
@@ -238,23 +243,26 @@ function PocketCard({
 
   return (
     <Card>
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--border)] px-5 py-4">
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--edge)] px-5 py-4">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-[15px] font-bold text-ink-900">{pocket.name}</h2>
+            <h2 className="text-[15px] font-bold text-[var(--text)]">{pocket.name}</h2>
             {p.affordable ? (
               <Badge tone="good">funded by the forecast</Badge>
             ) : p.effectiveMonthly > 0 ? (
               <Badge tone="warn">partly funded</Badge>
             ) : (
-              <Badge tone="bad">not funded this month</Badge>
+              // Pockets are funded in order, so a later one can be left with
+              // nothing even while the forecast still shows a surplus. Saying
+              // only "not funded" would read as a contradiction of the banner.
+              <Badge tone="bad">earlier pockets take the surplus</Badge>
             )}
           </div>
           <p className="mt-0.5 text-[13px] text-[var(--muted)]">
             {pocket.item || 'No item details given'}
           </p>
         </div>
-        <button onClick={onDelete} className="text-[12px] font-semibold text-rose-600 hover:underline">
+        <button onClick={onDelete} className="text-[12px] font-semibold text-blush-ink hover:underline">
           Remove
         </button>
       </div>
@@ -285,8 +293,8 @@ function PocketCard({
 
       {/* Where the plan and the forecast disagree, both dates are shown. */}
       {!p.affordable && (
-        <div className="mx-5 mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-          <p className="text-[13px] leading-relaxed text-ink-900">
+        <div className="mx-5 mb-5 rounded-xl nb bg-peach px-4 py-3">
+          <p className="text-[13px] leading-relaxed text-[var(--text)]">
             {p.effectiveMonthly > 0 ? (
               <>
                 The forecast only leaves <strong>{displayMoney(p.effectiveMonthly)}</strong> a month for
@@ -313,10 +321,10 @@ function PocketCard({
       )}
 
       {p.dps.length > 0 && (
-        <div className="border-t border-[var(--border)]">
+        <div className="border-t border-[var(--edge)]">
           <button
             onClick={() => setOpen((v) => !v)}
-            className="flex w-full items-center justify-between px-5 py-3 text-[13px] font-semibold text-brand-600 hover:bg-brand-50"
+            className="flex w-full items-center justify-between px-5 py-3 text-[13px] font-semibold text-lilac-ink hover:bg-lav-50"
           >
             <span>
               {open ? 'Hide' : 'Show'} the month-by-month DPS schedule ({p.dps.length} months)
@@ -329,16 +337,16 @@ function PocketCard({
               <div className="h-[220px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#eef2f0" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(43,36,64,0.12)" vertical={false} />
                     <XAxis
                       dataKey="month"
-                      tick={{ fontSize: 10, fill: '#5d6f69' }}
+                      tick={{ fontSize: 10, fill: '#6b6285' }}
                       axisLine={false}
                       tickLine={false}
                       interval={Math.max(0, Math.floor(chartData.length / 8))}
                     />
                     <YAxis
-                      tick={{ fontSize: 11, fill: '#5d6f69' }}
+                      tick={{ fontSize: 11, fill: '#6b6285' }}
                       axisLine={false}
                       tickLine={false}
                       width={58}
@@ -354,19 +362,19 @@ function PocketCard({
                     <Line
                       type="monotone"
                       dataKey="plain"
-                      stroke="#94a3b8"
+                      stroke="#8f87a5"
                       strokeWidth={2}
                       strokeDasharray="5 4"
                       dot={false}
                     />
-                    <Line type="monotone" dataKey="dps" stroke="#0b7a66" strokeWidth={2.5} dot={false} />
+                    <Line type="monotone" dataKey="dps" stroke="#7b4fd4" strokeWidth={2.5} dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
 
-              <div className="mt-3 max-h-64 overflow-y-auto rounded-xl border border-[var(--border)]">
+              <div className="mt-3 max-h-64 overflow-y-auto rounded-xl border border-[var(--edge)]">
                 <table className="w-full text-left text-[12px]">
-                  <thead className="sticky top-0 bg-slate-50">
+                  <thead className="sticky top-0 bg-[var(--card-sunk)]">
                     <tr className="text-[10px] tracking-wide text-[var(--muted)] uppercase">
                       <th className="px-3 py-2 font-semibold">Month</th>
                       <th className="px-3 py-2 text-right font-semibold">Deposit</th>
@@ -374,7 +382,7 @@ function PocketCard({
                       <th className="px-3 py-2 text-right font-semibold">Balance</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[var(--border)]">
+                  <tbody className="divide-y divide-[var(--edge)]/15">
                     {p.dps.map((r) => (
                       <tr key={r.monthIndex}>
                         <td className="px-3 py-1.5 whitespace-nowrap">
@@ -382,7 +390,7 @@ function PocketCard({
                           {monthLabelShort(r.month)}
                         </td>
                         <td className="tabular px-3 py-1.5 text-right">{displayMoney(r.deposit)}</td>
-                        <td className="tabular px-3 py-1.5 text-right text-emerald-700">
+                        <td className="tabular px-3 py-1.5 text-right text-mint-ink">
                           {displayMoney(r.interest)}
                         </td>
                         <td className="tabular px-3 py-1.5 text-right font-semibold">
@@ -397,7 +405,7 @@ function PocketCard({
               <p className="mt-2 text-[12px] leading-relaxed text-[var(--muted)]">
                 Putting {displayMoney(pocket.monthlyContribution)} a month into a DPS at{' '}
                 {rate.toFixed(2)}% for the {p.dps.length} months this pocket takes would return{' '}
-                <strong className="text-ink-900">{displayMoney(p.dpsValueAtCompletion)}</strong> —{' '}
+                <strong className="text-[var(--text)]">{displayMoney(p.dpsValueAtCompletion)}</strong> —{' '}
                 {displayMoney(p.dpsInterest)} more than the {displayMoney(p.contributedAtCompletion)}{' '}
                 deposited, against a target of {displayMoney(pocket.target)}.
                 {p.dpsMonthsToTarget && p.monthsSavedByDps !== null && p.monthsSavedByDps > 0 && (
@@ -405,7 +413,7 @@ function PocketCard({
                     {' '}
                     Because the interest compounds, a DPS covers the{' '}
                     {displayMoney(pocket.target)} target after only{' '}
-                    <strong className="text-ink-900">{p.dpsMonthsToTarget} months</strong> —{' '}
+                    <strong className="text-[var(--text)]">{p.dpsMonthsToTarget} months</strong> —{' '}
                     {p.monthsSavedByDps}{' '}
                     {p.monthsSavedByDps === 1 ? 'month' : 'months'} sooner than setting the same
                     amount aside without interest.
@@ -431,7 +439,7 @@ function Figure({
   sub?: string;
   tone?: 'neutral' | 'brand' | 'good';
 }) {
-  const tones = { neutral: 'text-ink-900', brand: 'text-brand-600', good: 'text-emerald-700' };
+  const tones = { neutral: 'text-[var(--text)]', brand: 'text-lilac-ink', good: 'text-mint-ink' };
   return (
     <div>
       <p className="text-[11px] font-medium tracking-wide text-[var(--muted)] uppercase">{label}</p>

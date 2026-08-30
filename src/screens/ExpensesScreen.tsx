@@ -163,6 +163,7 @@ export default function ExpensesScreen() {
     <div className="space-y-5">
       {/* Salary */}
       <Card
+        accent="sky"
         title="Monthly salary"
         subtitle="Everything on the dashboard and in the forecast is measured against this figure."
       >
@@ -182,7 +183,7 @@ export default function ExpensesScreen() {
           </Button>
           {salary > 0 && (
             <p className="pb-2.5 text-[13px] text-[var(--muted)]">
-              Currently <strong className="tabular text-ink-900">{displayMoney(salary)}</strong> a month.
+              Currently <strong className="tabular text-[var(--text)]">{displayMoney(salary)}</strong> a month.
             </p>
           )}
         </div>
@@ -190,6 +191,7 @@ export default function ExpensesScreen() {
 
       {/* Receipt upload */}
       <Card
+        accent="butter"
         title="Add an expense from a receipt photo"
         subtitle="The amount, date and shop are read from the image. Nothing is saved until you have checked them."
       >
@@ -207,8 +209,8 @@ export default function ExpensesScreen() {
           />
 
           {!parsed && !ocrBusy && (
-            <div className="rounded-xl border border-dashed border-[var(--border)] bg-brand-50/40 px-5 py-8 text-center">
-              <p className="text-[13px] font-semibold text-ink-900">
+            <div className="rounded-xl border border-2 border-dashed border-[var(--edge)]/45 bg-lav-50 px-5 py-8 text-center">
+              <p className="text-[13px] font-semibold text-[var(--text)]">
                 Upload or photograph a bill
               </p>
               <p className="mx-auto mt-1 max-w-md text-[12px] leading-relaxed text-[var(--muted)]">
@@ -222,11 +224,11 @@ export default function ExpensesScreen() {
           )}
 
           {ocrBusy && (
-            <div className="rounded-xl border border-[var(--border)] px-5 py-8 text-center">
-              <p className="text-[13px] font-semibold text-ink-900">Reading the receipt…</p>
-              <div className="mx-auto mt-3 h-1.5 w-64 overflow-hidden rounded-full bg-slate-100">
+            <div className="rounded-xl border border-[var(--edge)] px-5 py-8 text-center">
+              <p className="text-[13px] font-semibold text-[var(--text)]">Reading the receipt…</p>
+              <div className="mx-auto mt-3 h-1.5 w-64 overflow-hidden rounded-full bg-[var(--card-sunk)]">
                 <div
-                  className="h-full rounded-full bg-brand-500 transition-[width]"
+                  className="h-full rounded-full bg-lav-400 transition-[width]"
                   style={{ width: `${Math.max(6, ocrProgress)}%` }}
                 />
               </div>
@@ -235,7 +237,7 @@ export default function ExpensesScreen() {
           )}
 
           {ocrError && (
-            <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-800">
+            <p className="rounded-xl nb bg-peach px-4 py-3 text-[13px] text-peach-ink">
               {ocrError}
             </p>
           )}
@@ -248,29 +250,29 @@ export default function ExpensesScreen() {
                   <img
                     src={imageUrl}
                     alt="The uploaded receipt"
-                    className="w-full rounded-xl border border-[var(--border)] object-contain"
+                    className="w-full rounded-xl border border-[var(--edge)] object-contain"
                     style={{ maxHeight: 320 }}
                   />
                 )}
                 <button
                   onClick={() => setShowRaw((v) => !v)}
-                  className="mt-2 text-[12px] font-semibold text-brand-600 hover:underline"
+                  className="mt-2 text-[12px] font-semibold text-lilac-ink hover:underline"
                 >
                   {showRaw ? 'Hide' : 'Show'} the raw text that was read
                 </button>
                 {showRaw && (
-                  <pre className="mt-2 max-h-56 overflow-auto rounded-xl border border-[var(--border)] bg-slate-50 p-3 text-[11px] leading-relaxed whitespace-pre-wrap text-slate-700">
+                  <pre className="mt-2 max-h-56 overflow-auto rounded-xl border border-[var(--edge)] bg-[var(--card-sunk)] p-3 text-[11px] leading-relaxed whitespace-pre-wrap text-[var(--muted)]">
                     {parsed.rawText.trim() || '(the reader returned no text)'}
                   </pre>
                 )}
               </div>
 
               <div>
-                <div className="mb-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3">
-                  <p className="text-[13px] font-semibold text-brand-600">
+                <div className="mb-3 rounded-xl border nb bg-lilac px-4 py-3">
+                  <p className="text-[13px] font-semibold text-lilac-ink">
                     Check what was read before saving
                   </p>
-                  <p className="mt-0.5 text-[12px] leading-relaxed text-ink-800">
+                  <p className="mt-0.5 text-[12px] leading-relaxed text-[var(--text)]">
                     Every field below can be corrected. Anything the reader was unsure about is
                     marked, and what you change is recorded with the expense.
                   </p>
@@ -339,7 +341,7 @@ export default function ExpensesScreen() {
 
                 {correctedFields.length > 0 && (
                   <p className="mt-3 text-[12px] text-[var(--muted)]">
-                    You have corrected: <strong className="text-ink-900">{correctedFields.join(', ')}</strong>.
+                    You have corrected: <strong className="text-[var(--text)]">{correctedFields.join(', ')}</strong>.
                     This is saved with the expense.
                   </p>
                 )}
@@ -366,6 +368,7 @@ export default function ExpensesScreen() {
 
       {/* Manual entry */}
       <Card
+        accent="mint"
         title="Add an expense by hand"
         subtitle="The same ledger, without a photo — also the fallback if a receipt will not read."
       >
@@ -415,6 +418,7 @@ export default function ExpensesScreen() {
 
       {/* Ledger */}
       <Card
+        accent="lilac"
         title="All expenses"
         subtitle={`${expenses.length} entries, newest first`}
       >
@@ -427,7 +431,7 @@ export default function ExpensesScreen() {
           <div className="max-h-[520px] overflow-y-auto">
             <table className="w-full text-left text-[13px]">
               <thead className="sticky top-0 bg-[var(--card)]">
-                <tr className="border-b border-[var(--border)] text-[11px] tracking-wide text-[var(--muted)] uppercase">
+                <tr className="border-b border-[var(--edge)] text-[11px] tracking-wide text-[var(--muted)] uppercase">
                   <th className="px-5 py-2.5 font-semibold">Date</th>
                   <th className="px-3 py-2.5 font-semibold">Shop</th>
                   <th className="px-3 py-2.5 font-semibold">Category</th>
@@ -436,7 +440,7 @@ export default function ExpensesScreen() {
                   <th className="px-5 py-2.5" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border)]">
+              <tbody className="divide-y divide-[var(--edge)]/15">
                 {sorted.map((e) => (
                   <tr key={e.id} className={monthOf(e.date) === monthOf(today) ? '' : 'opacity-60'}>
                     <td className="tabular px-5 py-2.5 whitespace-nowrap">{dateLabel(e.date)}</td>
@@ -446,7 +450,7 @@ export default function ExpensesScreen() {
                           <img
                             src={e.receipt.imageDataUrl}
                             alt=""
-                            className="size-7 shrink-0 rounded border border-[var(--border)] object-cover"
+                            className="size-7 shrink-0 rounded border border-[var(--edge)] object-cover"
                           />
                         )}
                         {e.shop}
@@ -481,7 +485,7 @@ export default function ExpensesScreen() {
                     <td className="px-5 py-2.5 text-right">
                       <button
                         onClick={() => deleteExpense(e.id)}
-                        className="text-[12px] font-semibold text-rose-600 hover:underline"
+                        className="text-[12px] font-semibold text-blush-ink hover:underline"
                       >
                         Remove
                       </button>

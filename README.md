@@ -1,6 +1,8 @@
-# Personal Ledger Manager
+# Khoroch — Personal Ledger Manager
 
 Solution for **LofiStack Hackathon 2026 — P12**
+
+*Khoroch* (খরচ) is Bengali for "expense" — the word a user of this app would actually reach for.
 
 ## Project information
 
@@ -160,6 +162,10 @@ image to confirm the reading, review and saving path works end to end.
 ## Technology used
 
 - **Frontend:** React 19, TypeScript 5, Vite 8, Tailwind CSS v4, Recharts 2, Zustand 5
+- **Interface:** a soft neo-brutalist treatment — solid dark borders with hard, unblurred offset
+  shadows, rounded cards on a lavender ground, and a rotating pastel accent set. Money itself stays
+  near-black on white: a ledger where every figure is tinted is a ledger nobody can scan, so colour
+  marks containers and categories rather than the numbers.
 - **Backend:** none — the application is entirely client-side
 - **Database:** browser `localStorage`
 - **Receipt reading:** Tesseract.js 5, running in the browser

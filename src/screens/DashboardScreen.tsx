@@ -25,24 +25,27 @@ import { useLedger } from '../store/ledger.store';
 /**
  * Category colours.
  *
- * A fixed hue per category, so a category keeps its colour between the donut,
- * the bars and the table. Ordered to keep adjacent slices distinguishable.
+ * A fixed pastel per category, so a category keeps its colour across the
+ * donut, the bars and the tables. Every slice is outlined in the same dark
+ * edge as the rest of the interface, which is what lets tones this soft stay
+ * legible next to each other. Rent leads on lilac because it is the largest
+ * slice in most months, tying the chart to the accent used elsewhere.
  */
 export const CATEGORY_COLORS: Record<string, string> = {
-  Rent: '#08584a',
-  Groceries: '#14a184',
-  Food: '#f59e0b',
-  Transport: '#3b82f6',
-  Utilities: '#8b5cf6',
-  Mobile: '#ec4899',
-  Health: '#ef4444',
-  Education: '#0ea5e9',
-  Entertainment: '#f97316',
-  Clothing: '#84cc16',
-  Other: '#64748b',
+  Rent: '#a98fe6',
+  Groceries: '#8ed9bb',
+  Food: '#ffb877',
+  Transport: '#8fc4f0',
+  Utilities: '#c9a8f5',
+  Mobile: '#ff9dbb',
+  Health: '#f78ba0',
+  Education: '#7fd4dd',
+  Entertainment: '#ffc46b',
+  Clothing: '#b8dd7a',
+  Other: '#b9b2cc',
 };
 
-export const colorFor = (c: string): string => CATEGORY_COLORS[c] ?? '#64748b';
+export const colorFor = (c: string): string => CATEGORY_COLORS[c] ?? '#b9b2cc';
 
 export default function DashboardScreen() {
   const state = useLedger();
@@ -73,23 +76,27 @@ export default function DashboardScreen() {
     <div className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
+          accent="sky"
           label="Salary"
           value={displayMoney(summary.salary)}
           sub={`Monthly income for ${monthLabel(thisMonth)}`}
         />
         <Stat
+          accent="peach"
           label="Spent this month"
           value={displayMoney(summary.totalSpent)}
           tone={summary.totalSpent > summary.salary ? 'bad' : 'neutral'}
           sub={`${summary.spentShare.toFixed(1)}% of salary over ${summary.expenses.length} entries`}
         />
         <Stat
+          accent={summary.remaining >= 0 ? 'mint' : 'blush'}
           label={summary.remaining >= 0 ? 'Left so far' : 'Over salary'}
           value={displayMoney(Math.abs(summary.remaining))}
           tone={summary.remaining >= 0 ? 'good' : 'bad'}
           sub={`Day ${summary.daysElapsed} of ${summary.daysInMonth} — ${summary.daysRemaining} days remain`}
         />
         <Stat
+          accent="lilac"
           label={`vs ${monthLabelShortSafe(lastMonth)}`}
           value={`${monthDelta >= 0 ? '+' : '−'}${displayMoney(Math.abs(monthDelta)).slice(1)}`}
           tone={monthDelta > 0 ? 'bad' : 'good'}
@@ -105,20 +112,23 @@ export default function DashboardScreen() {
 
       {/* Salary consumption bar — the single clearest read of the month. */}
       <Card
+        accent="butter"
         title={`Spending against salary — ${monthLabel(thisMonth)}`}
         subtitle={`${displayMoney(summary.totalSpent)} of ${displayMoney(summary.salary)} used`}
       >
         <div className="px-5 py-5">
-          <div className="relative h-9 w-full overflow-hidden rounded-xl bg-slate-100">
+          <div className="nb-sm relative h-11 w-full overflow-hidden rounded-full bg-[var(--card-sunk)]">
             <div
-              className={`h-full ${summary.spentShare > 100 ? 'bg-rose-500' : 'bg-brand-500'}`}
+              className={`h-full transition-[width] duration-700 ${
+                summary.spentShare > 100 ? 'bg-blush' : 'bg-mint'
+              }`}
               style={{ width: `${Math.min(100, summary.spentShare)}%` }}
             />
-            <span className="tabular absolute inset-y-0 left-3 flex items-center text-[13px] font-bold text-white mix-blend-plus-lighter">
+            <span className="tabular absolute inset-y-0 left-4 flex items-center text-[13px] font-extrabold text-[var(--text)]">
               {summary.spentShare.toFixed(1)}%
             </span>
           </div>
-          <div className="mt-2 flex justify-between text-[12px] text-[var(--muted)]">
+          <div className="mt-2.5 flex justify-between text-[12px] font-semibold text-[var(--text)]/70">
             <span>{displayMoney(0)}</span>
             <span>
               {summary.remaining >= 0
@@ -134,6 +144,7 @@ export default function DashboardScreen() {
         {/* Category breakdown */}
         <Card
           className="lg:col-span-3"
+          accent="mint"
           title="Breakdown by category"
           subtitle={`${donut.length} categories with spending this month`}
         >
@@ -145,10 +156,11 @@ export default function DashboardScreen() {
                     data={donut}
                     dataKey="total"
                     nameKey="category"
-                    innerRadius={48}
-                    outerRadius={82}
-                    paddingAngle={2}
-                    stroke="none"
+                    innerRadius={44}
+                    outerRadius={86}
+                    paddingAngle={0}
+                    stroke="#2b2440"
+                    strokeWidth={1.5}
                   >
                     {donut.map((c) => (
                       <Cell key={c.category} fill={colorFor(c.category)} />
@@ -166,7 +178,7 @@ export default function DashboardScreen() {
               {donut.map((c) => (
                 <li key={c.category}>
                   <div className="flex items-baseline justify-between gap-3 text-[13px]">
-                    <span className="flex items-center gap-2 font-medium text-ink-900">
+                    <span className="flex items-center gap-2 font-medium text-[var(--text)]">
                       <span
                         className="size-2.5 shrink-0 rounded-full"
                         style={{ background: colorFor(c.category) }}
@@ -184,7 +196,7 @@ export default function DashboardScreen() {
                     </span>
                   </div>
                   <div className="mt-1">
-                    <Meter value={c.share} />
+                    <Meter value={c.share} color={colorFor(c.category)} />
                   </div>
                 </li>
               ))}
@@ -195,10 +207,11 @@ export default function DashboardScreen() {
         {/* Largest expenses */}
         <Card
           className="lg:col-span-2"
+          accent="peach"
           title="Largest expenses"
           subtitle="The five biggest single charges this month"
         >
-          <ol className="divide-y divide-[var(--border)]">
+          <ol className="divide-y divide-[var(--edge)]/15">
             {summary.largest.map((e, i) => (
               <li key={e.id} className="flex items-center gap-3 px-5 py-3">
                 <span className="tabular w-5 shrink-0 text-[13px] font-bold text-[var(--muted)]">
@@ -209,7 +222,7 @@ export default function DashboardScreen() {
                   style={{ background: colorFor(e.category) }}
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[13px] font-semibold text-ink-900">{e.shop}</p>
+                  <p className="truncate text-[13px] font-semibold text-[var(--text)]">{e.shop}</p>
                   <p className="text-[12px] text-[var(--muted)]">
                     {e.category} · {dateLabel(e.date)}
                   </p>
@@ -228,6 +241,7 @@ export default function DashboardScreen() {
 
       {/* Month-on-month comparison */}
       <Card
+        accent="lilac"
         title={`Change against ${monthLabel(lastMonth)}`}
         subtitle="Every category that has spending in either month"
       >
@@ -243,7 +257,7 @@ export default function DashboardScreen() {
             >
               <XAxis
                 dataKey="category"
-                tick={{ fontSize: 11, fill: '#5d6f69' }}
+                tick={{ fontSize: 11, fill: '#6b6285' }}
                 axisLine={false}
                 tickLine={false}
                 interval={0}
@@ -252,7 +266,7 @@ export default function DashboardScreen() {
                 height={56}
               />
               <YAxis
-                tick={{ fontSize: 11, fill: '#5d6f69' }}
+                tick={{ fontSize: 11, fill: '#6b6285' }}
                 axisLine={false}
                 tickLine={false}
                 width={54}
@@ -264,15 +278,19 @@ export default function DashboardScreen() {
                   n === 'last' ? monthLabel(lastMonth) : monthLabel(thisMonth),
                 ]}
                 contentStyle={tooltipStyle}
-                cursor={{ fill: 'rgba(20,161,132,0.06)' }}
+                cursor={{ fill: 'rgba(169,143,230,0.18)' }}
               />
-              <Bar dataKey="last" fill="#cbd5e1" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="current" fill="#14a184" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="last" fill="#d9ccf7" stroke="#2b2440" strokeWidth={2} radius={[6, 6, 0, 0]} />
+              <Bar dataKey="current" stroke="#2b2440" strokeWidth={2} radius={[6, 6, 0, 0]}>
+                {summary.categories.map((c) => (
+                  <Cell key={c.category} fill={colorFor(c.category)} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="border-t border-[var(--border)] px-5 py-4">
+        <div className="border-t border-[var(--edge)] px-5 py-4">
           <div className="mb-2 flex items-center gap-4 text-[12px] text-[var(--muted)]">
             <span className="flex items-center gap-1.5">
               <span className="size-2.5 rounded-sm bg-slate-300" /> {monthLabel(lastMonth)}
@@ -292,7 +310,7 @@ export default function DashboardScreen() {
                   <th className="py-2 text-right font-semibold">%</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border)]">
+              <tbody className="divide-y divide-[var(--edge)]/15">
                 {summary.categories.map((c) => (
                   <tr key={c.category}>
                     <td className="py-2 pr-3 font-medium">
@@ -312,7 +330,7 @@ export default function DashboardScreen() {
                     </td>
                     <td
                       className={`tabular py-2 pr-3 text-right font-medium ${
-                        c.delta > 0 ? 'text-rose-600' : c.delta < 0 ? 'text-emerald-600' : 'text-[var(--muted)]'
+                        c.delta > 0 ? 'text-blush-ink' : c.delta < 0 ? 'text-mint-ink' : 'text-[var(--muted)]'
                       }`}
                     >
                       {c.delta === 0 ? '—' : `${c.delta > 0 ? '+' : '−'}${displayMoney(Math.abs(c.delta)).slice(1)}`}
@@ -323,7 +341,7 @@ export default function DashboardScreen() {
                       ) : (
                         <span
                           className={`tabular text-[12px] font-semibold ${
-                            c.delta > 0 ? 'text-rose-600' : c.delta < 0 ? 'text-emerald-600' : 'text-[var(--muted)]'
+                            c.delta > 0 ? 'text-blush-ink' : c.delta < 0 ? 'text-mint-ink' : 'text-[var(--muted)]'
                           }`}
                         >
                           {c.deltaPct > 0 ? '+' : ''}
@@ -344,9 +362,9 @@ export default function DashboardScreen() {
 
 export const tooltipStyle = {
   borderRadius: 12,
-  border: '1px solid #e2e8e5',
+  border: '2px solid #2b2440',
   fontSize: 12,
-  boxShadow: '0 4px 16px rgba(12,31,25,0.08)',
+  background: '#ffffff', color: '#201a33', fontWeight: 600, boxShadow: '4px 4px 0 0 #2b2440',
 } as const;
 
 function monthLabelShortSafe(m: string): string {

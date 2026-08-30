@@ -1,26 +1,56 @@
 @import 'tailwindcss';
 
+/**
+ * Khoroch — soft neo-brutalist theme.
+ *
+ * A lavender ground with white cards that carry a solid dark border and a hard
+ * offset shadow: no blur anywhere, so edges stay crisp and the interface reads
+ * as assembled from cut paper. Accent colour rotates through a pastel set
+ * rather than resolving to one hue, which is what keeps the surface friendly.
+ *
+ * The one thing held back from the reference is colour on money. Figures stay
+ * near-black on white, with pastel used for the containers around them — a
+ * ledger where every number is tinted is a ledger nobody can read.
+ */
+
 @theme {
-  --color-ink-950: #071410;
-  --color-ink-900: #0c1f19;
-  --color-ink-800: #123028;
-  --color-ink-700: #1b4438;
-  --color-brand-600: #08584a;
-  --color-brand-500: #0b7a66;
-  --color-brand-400: #14a184;
-  --color-brand-300: #50cdb7;
-  --color-brand-200: #9ae6d5;
-  --color-brand-50: #ecfdf7;
+  /* Pastels. Each has a soft fill and a saturated ink for text on top of it. */
+  --color-mint: #b8e6d4;
+  --color-mint-ink: #10614a;
+  --color-peach: #ffcfa8;
+  --color-peach-ink: #8a4b12;
+  --color-lilac: #d9c9f7;
+  --color-lilac-ink: #543094;
+  --color-butter: #ffe49b;
+  --color-butter-ink: #8a6410;
+  --color-blush: #ffc9d9;
+  --color-blush-ink: #97294f;
+  --color-sky: #bcd9f7;
+  --color-sky-ink: #17548f;
+
+  /* Structure. The dark border is the backbone of the whole style. */
+  --color-edge: #2b2440;
+  --color-lav-50: #f4f0fd;
+  --color-lav-100: #e9e1fb;
+  --color-lav-200: #d9ccf7;
+  --color-lav-300: #c3b0f0;
+  --color-lav-400: #a98fe6;
+
   --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 :root {
   color-scheme: light;
-  --surface: #f6f8f7;
+  --surface: #ddd2f5;
   --card: #ffffff;
-  --border: #e2e8e5;
-  --text: #0c1f19;
-  --muted: #5d6f69;
+  --card-sunk: #f7f4fd;
+  --edge: #2b2440;
+  --text: #201a33;
+  --muted: #6b6285;
+  --muted-dim: #8f87a5;
+  --accent: #a98fe6;
+  --positive: #10614a;
+  --negative: #97294f;
 }
 
 html,
@@ -35,17 +65,54 @@ body {
   color: var(--text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Numbers in tables and money readouts must line up column to column. */
 .tabular {
   font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/**
+ * The card treatment: solid border, hard offset shadow, no blur radius.
+ * `--nb-offset` lets a single card be pressed in or lifted further without
+ * redefining the whole shadow.
+ */
+.nb {
+  --nb-offset: 4px;
+  border: 2px solid var(--edge);
+  box-shadow: var(--nb-offset) var(--nb-offset) 0 0 var(--edge);
+}
+
+.nb-sm {
+  --nb-offset: 3px;
+  border: 2px solid var(--edge);
+  box-shadow: var(--nb-offset) var(--nb-offset) 0 0 var(--edge);
+}
+
+/* Interactive elements travel into their own shadow when pressed. */
+.nb-press {
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.nb-press:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: calc(var(--nb-offset) + 1px) calc(var(--nb-offset) + 1px) 0 0 var(--edge);
+}
+
+.nb-press:active:not(:disabled) {
+  transform: translate(var(--nb-offset), var(--nb-offset));
+  box-shadow: 0 0 0 0 var(--edge);
 }
 
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -54,11 +121,41 @@ body {
 }
 
 .rise {
-  animation: rise 0.28s ease-out both;
+  animation: rise 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Focus ring that stays visible on both the light surface and the brand fill. */
+/* Scrollbars styled to match the border-and-track language. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--edge) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--edge);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+}
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+input[type='date']::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
 :where(button, a, input, select, textarea):focus-visible {
-  outline: 2px solid var(--color-brand-500);
+  outline: 3px solid var(--color-lav-400);
   outline-offset: 2px;
 }

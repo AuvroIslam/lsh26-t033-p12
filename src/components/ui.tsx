@@ -1,28 +1,70 @@
 /** Small shared presentational pieces. No business logic lives here. */
 import type { ReactNode } from 'react';
 
+/**
+ * The pastel accents, in the order they are handed out.
+ *
+ * Cards and stats rotate through these by position rather than resolving to a
+ * single brand colour — that rotation is what makes the surface read as
+ * friendly rather than corporate.
+ */
+export const PASTELS = ['mint', 'peach', 'lilac', 'butter', 'blush', 'sky'] as const;
+export type Pastel = (typeof PASTELS)[number];
+
+export const pastelFill: Record<Pastel, string> = {
+  mint: 'bg-mint',
+  peach: 'bg-peach',
+  lilac: 'bg-lilac',
+  butter: 'bg-butter',
+  blush: 'bg-blush',
+  sky: 'bg-sky',
+};
+
+export const pastelInk: Record<Pastel, string> = {
+  mint: 'text-mint-ink',
+  peach: 'text-peach-ink',
+  lilac: 'text-lilac-ink',
+  butter: 'text-butter-ink',
+  blush: 'text-blush-ink',
+  sky: 'text-sky-ink',
+};
+
+/** Pick a pastel by index, wrapping — used to colour lists consistently. */
+export const pastelAt = (i: number): Pastel => PASTELS[i % PASTELS.length];
+
 export function Card({
   children,
   className = '',
   title,
   subtitle,
   action,
+  accent,
 }: {
   children: ReactNode;
   className?: string;
   title?: ReactNode;
   subtitle?: ReactNode;
   action?: ReactNode;
+  /** Tints the header strip, so a page of cards is not a page of white boxes. */
+  accent?: Pastel;
 }) {
   return (
-    <section
-      className={`rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-[0_1px_2px_rgba(12,31,25,0.04)] ${className}`}
-    >
+    <section className={`nb overflow-hidden rounded-2xl bg-[var(--card)] ${className}`}>
       {(title || action) && (
-        <header className="flex items-start justify-between gap-4 border-b border-[var(--border)] px-5 py-4">
+        <header
+          className={`flex items-start justify-between gap-4 border-b-2 border-[var(--edge)] px-5 py-3.5 ${
+            accent ? pastelFill[accent] : 'bg-[var(--card-sunk)]'
+          }`}
+        >
           <div>
-            {title && <h2 className="text-[15px] font-semibold text-ink-900">{title}</h2>}
-            {subtitle && <p className="mt-0.5 text-[13px] text-[var(--muted)]">{subtitle}</p>}
+            {title && (
+              <h2 className="text-[15px] font-extrabold tracking-tight text-[var(--text)]">
+                {title}
+              </h2>
+            )}
+            {subtitle && (
+              <p className="mt-0.5 text-[12.5px] font-medium text-[var(--text)]/70">{subtitle}</p>
+            )}
           </div>
           {action}
         </header>
@@ -50,13 +92,13 @@ export function Button({
   size?: 'sm' | 'md';
 }) {
   const base =
-    'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-45';
-  const sizes = { sm: 'px-3 py-1.5 text-[13px]', md: 'px-4 py-2.5 text-sm' };
+    'nb-sm nb-press inline-flex items-center justify-center gap-2 rounded-full font-bold text-[var(--text)] disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none disabled:hover:transform-none';
+  const sizes = { sm: 'px-3.5 py-1.5 text-[13px]', md: 'px-5 py-2.5 text-sm' };
   const variants = {
-    primary: 'bg-brand-600 text-white hover:bg-brand-500',
-    outline: 'border border-[var(--border)] bg-white text-ink-900 hover:bg-brand-50',
-    ghost: 'text-ink-800 hover:bg-brand-50',
-    danger: 'border border-rose-200 bg-white text-rose-700 hover:bg-rose-50',
+    primary: 'bg-butter hover:bg-[#ffdb7d]',
+    outline: 'bg-[var(--card)] hover:bg-lav-50',
+    ghost: 'border-transparent bg-transparent shadow-none hover:bg-white/60',
+    danger: 'bg-blush hover:bg-[#ffb3c8]',
   };
   return (
     <button
@@ -84,17 +126,17 @@ export function Field({
   return (
     <label className="block">
       <span className="flex items-center justify-between gap-2">
-        <span className="text-[13px] font-medium text-ink-800">{label}</span>
+        <span className="text-[12.5px] font-bold text-[var(--text)]">{label}</span>
         {flag}
       </span>
       <div className="mt-1.5">{children}</div>
-      {hint && <p className="mt-1 text-[12px] leading-relaxed text-[var(--muted)]">{hint}</p>}
+      {hint && <p className="mt-1.5 text-[12px] leading-relaxed text-[var(--muted)]">{hint}</p>}
     </label>
   );
 }
 
 const inputCls =
-  'w-full rounded-xl border border-[var(--border)] bg-white px-3 py-2.5 text-sm text-ink-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-400';
+  'nb-sm w-full rounded-xl bg-[var(--card)] px-3 py-2.5 text-sm font-medium text-[var(--text)] outline-none transition-colors placeholder:font-normal placeholder:text-[var(--muted-dim)] focus:bg-lav-50';
 
 export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={`${inputCls} ${props.className ?? ''}`} />;
@@ -111,16 +153,17 @@ export function Badge({
   children: ReactNode;
   tone?: 'neutral' | 'good' | 'warn' | 'bad' | 'brand';
 }) {
+  // Solid pastel pills with the same dark edge as everything else.
   const tones = {
-    neutral: 'bg-slate-100 text-slate-700',
-    good: 'bg-emerald-50 text-emerald-700',
-    warn: 'bg-amber-50 text-amber-700',
-    bad: 'bg-rose-50 text-rose-700',
-    brand: 'bg-brand-50 text-brand-600',
+    neutral: 'bg-lav-100 text-[var(--text)]',
+    good: 'bg-mint text-mint-ink',
+    warn: 'bg-peach text-peach-ink',
+    bad: 'bg-blush text-blush-ink',
+    brand: 'bg-lilac text-lilac-ink',
   };
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${tones[tone]}`}
+      className={`inline-flex items-center gap-1 rounded-full border-[1.5px] border-[var(--edge)] px-2 py-0.5 text-[11px] font-bold ${tones[tone]}`}
     >
       {children}
     </span>
@@ -133,39 +176,57 @@ export function Stat({
   value,
   sub,
   tone = 'neutral',
+  accent,
 }: {
   label: string;
   value: ReactNode;
   sub?: ReactNode;
   tone?: 'neutral' | 'good' | 'bad' | 'brand';
+  accent?: Pastel;
 }) {
+  // The figure itself stays near-black whatever the card is tinted, because a
+  // ledger where every number is coloured is a ledger nobody can scan.
   const tones = {
-    neutral: 'text-ink-900',
-    good: 'text-emerald-700',
-    bad: 'text-rose-700',
-    brand: 'text-brand-600',
+    neutral: 'text-[var(--text)]',
+    good: 'text-mint-ink',
+    bad: 'text-blush-ink',
+    brand: 'text-lilac-ink',
   };
   return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-3.5">
-      <p className="text-[12px] font-medium tracking-wide text-[var(--muted)] uppercase">{label}</p>
-      <p className={`tabular mt-1.5 text-[22px] leading-tight font-bold ${tones[tone]}`}>{value}</p>
-      {sub && <p className="mt-1 text-[12px] leading-relaxed text-[var(--muted)]">{sub}</p>}
+    <div className={`nb rounded-2xl px-4 py-4 ${accent ? pastelFill[accent] : 'bg-[var(--card)]'}`}>
+      <p className="text-[11px] font-extrabold tracking-[0.06em] text-[var(--text)]/60 uppercase">
+        {label}
+      </p>
+      <p className={`tabular mt-2 text-[25px] leading-none font-extrabold tracking-tight ${tones[tone]}`}>
+        {value}
+      </p>
+      {sub && <p className="mt-2 text-[12px] leading-relaxed font-medium text-[var(--text)]/65">{sub}</p>}
     </div>
   );
 }
 
 /** Horizontal proportion bar used for the category breakdown. */
-export function Meter({ value, tone = 'brand' }: { value: number; tone?: 'brand' | 'bad' }) {
+export function Meter({
+  value,
+  tone = 'brand',
+  color,
+}: {
+  value: number;
+  tone?: 'brand' | 'bad';
+  color?: string;
+}) {
   const clamped = Math.max(0, Math.min(100, value));
   return (
     <div
-      className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
+      className="h-2.5 w-full overflow-hidden rounded-full border-[1.5px] border-[var(--edge)] bg-[var(--card-sunk)]"
       role="img"
       aria-label={`${clamped.toFixed(1)} percent`}
     >
       <div
-        className={`h-full rounded-full ${tone === 'brand' ? 'bg-brand-400' : 'bg-rose-400'}`}
-        style={{ width: `${clamped}%` }}
+        className={`h-full transition-[width] duration-500 ${
+          color ? '' : tone === 'brand' ? 'bg-lilac' : 'bg-blush'
+        }`}
+        style={{ width: `${clamped}%`, background: color }}
       />
     </div>
   );
@@ -173,10 +234,12 @@ export function Meter({ value, tone = 'brand' }: { value: number; tone?: 'brand'
 
 export function EmptyState({ title, body, action }: { title: string; body: string; action?: ReactNode }) {
   return (
-    <div className="px-5 py-12 text-center">
-      <p className="text-sm font-semibold text-ink-900">{title}</p>
-      <p className="mx-auto mt-1.5 max-w-md text-[13px] leading-relaxed text-[var(--muted)]">{body}</p>
-      {action && <div className="mt-4 flex justify-center">{action}</div>}
+    <div className="px-5 py-14 text-center">
+      <p className="text-[15px] font-extrabold text-[var(--text)]">{title}</p>
+      <p className="mx-auto mt-2 max-w-md text-[13px] leading-relaxed font-medium text-[var(--muted)]">
+        {body}
+      </p>
+      {action && <div className="mt-5 flex justify-center">{action}</div>}
     </div>
   );
 }
