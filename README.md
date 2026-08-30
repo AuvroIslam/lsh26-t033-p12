@@ -172,8 +172,9 @@ See [`LICENSES.md`](LICENSES.md) for third-party materials.
 
 | Registered member | GitHub username | Major contribution | Evidence |
 | --- | --- | --- | --- |
-| Oitijya Islam Auvro | `AuvroIslam` | <!-- TODO: fill in before submitting --> | <!-- TODO --> |
-| <!-- TODO: second member --> | <!-- TODO --> | <!-- TODO --> | <!-- TODO --> |
+| Oitijya Islam Auvro | `AuvroIslam` | Team lead. Repository setup, submission-kit templates and the published fixture; registered the team and coordinated the submission. <!-- TODO: expand if this member also reviewed or tested a specific area --> | Commits `3410393`, `c6e2afe`, `9665570` |
+| Md. Nafiz Ahmed | `Nafiz001` | <!-- TODO: state this member's major contribution --> | <!-- TODO --> |
+| Dewan Salman Rahman Zisan | `ripWr3ncH` | Application implementation: the money, forecast, insight, receipt-parsing and DPS services, the four screens, and the test suite. Drove the receipt path in a browser and measured the flat-rate forecast defect across all 25 cases. | Commits `b677a79` through `6376ff3`; `src/` and `src/services/__tests__/` |
 
 Commit count alone does not represent contribution.
 

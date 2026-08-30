@@ -35,14 +35,33 @@
     {
       "registered_name": "Oitijya Islam Auvro",
       "github_username": "AuvroIslam",
-      "major_contribution": "TODO: fill in before submitting",
+      "major_contribution": "Team lead. Repository setup, submission-kit templates and the published fixture; registered the team and coordinated the submission.",
+      "evidence_paths_or_commits": [
+        "3410393",
+        "c6e2afe",
+        "9665570"
+      ]
+    },
+    {
+      "registered_name": "Md. Nafiz Ahmed",
+      "github_username": "Nafiz001",
+      "major_contribution": "TODO: state this member's major contribution",
       "evidence_paths_or_commits": []
     },
     {
-      "registered_name": "TODO: second member name",
-      "github_username": "TODO",
-      "major_contribution": "TODO",
-      "evidence_paths_or_commits": []
+      "registered_name": "Dewan Salman Rahman Zisan",
+      "github_username": "ripWr3ncH",
+      "major_contribution": "Application implementation: the money, forecast, insight, receipt-parsing and DPS services, the four screens, and the test suite. Drove the receipt path end to end in a browser and measured the flat-rate forecast defect across all 25 published cases.",
+      "evidence_paths_or_commits": [
+        "b677a79",
+        "97e24b3",
+        "439e902",
+        "e5b6b45",
+        "3035539",
+        "6376ff3",
+        "src/",
+        "src/services/__tests__/"
+      ]
     }
   ],
   "major_design_decisions": [
