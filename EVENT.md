@@ -41,15 +41,14 @@ being built.
 
 The history carries two git author identities:
 
-| Identity | Email | Commits |
+| Identity | Registered member | Commits |
 |---|---|---|
-| `AuvroIslam` | crossgame2002@gmail.com | The first two, adding the submission-kit templates and the fixture |
-| `ripWr3ncH` | wrench.official0@gmail.com | The remainder, containing the application |
+| `AuvroIslam` | Oitijya Islam Auvro (team lead) | Repository setup, the submission-kit templates, the published fixture, and the registered team members |
+| `ripWr3ncH` | Dewan Salman Rahman Zisan | The application, its domain services and the test suite |
 
-<!-- TODO before submitting: state plainly which registered member each identity belongs to.
-     If both are the same person under two git configurations, say so in one line. If they are
-     two different registered members, name them. Judges read the history, and an undeclared
-     identity that authored the codebase invites a question that is easier to answer here. -->
+Both are registered members of team Logarithm, listed in `README.md` and
+`evaluation-manifest.json`. No commit in this repository was authored by anyone outside the
+registered team.
 
 ## AI assistance
 
