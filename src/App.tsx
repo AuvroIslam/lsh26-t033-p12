@@ -1,13 +1,18 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { Badge, Button } from './components/ui';
 import { dateLabel, monthLabel, monthOf } from './lib/dates';
 import { displayMoney } from './lib/money';
 import { loadFixture, type FixtureCase } from './services/fixture.service';
 import { useLedger } from './store/ledger.store';
-import DashboardScreen from './screens/DashboardScreen';
-import ExpensesScreen from './screens/ExpensesScreen';
-import ForecastScreen from './screens/ForecastScreen';
-import PocketsScreen from './screens/PocketsScreen';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { ToastProvider } from './components/Toast';
+
+// Recharts is most of the bundle and only the charting screens need it, so the
+// three that use it are split out and fetched when their tab is first opened.
+const DashboardScreen = lazy(() => import('./screens/DashboardScreen'));
+const ExpensesScreen = lazy(() => import('./screens/ExpensesScreen'));
+const ForecastScreen = lazy(() => import('./screens/ForecastScreen'));
+const PocketsScreen = lazy(() => import('./screens/PocketsScreen'));
 
 type Tab = 'dashboard' | 'expenses' | 'forecast' | 'pockets';
 
@@ -56,6 +61,7 @@ export default function App() {
   }
 
   return (
+    <ToastProvider>
     <div className="min-h-screen">
       <header className="sticky top-0 z-20 border-b-2 border-[var(--edge)] bg-[var(--surface)]/95 backdrop-blur-md">
         <div className="mx-auto max-w-6xl px-4 py-3.5 sm:px-6">
@@ -154,10 +160,16 @@ export default function App() {
           </p>
         )}
         <div className="rise" key={tab}>
-          {tab === 'dashboard' && <DashboardScreen />}
-          {tab === 'expenses' && <ExpensesScreen />}
-          {tab === 'forecast' && <ForecastScreen />}
-          {tab === 'pockets' && <PocketsScreen />}
+          {/* Keyed by tab so a failure on one screen is cleared by moving to
+              another, rather than persisting for the rest of the session. */}
+          <ErrorBoundary key={tab} area={TABS.find((t) => t.id === tab)?.label.toLowerCase()}>
+            <Suspense fallback={<ScreenSkeleton />}>
+              {tab === 'dashboard' && <DashboardScreen />}
+              {tab === 'expenses' && <ExpensesScreen />}
+              {tab === 'forecast' && <ForecastScreen />}
+              {tab === 'pockets' && <PocketsScreen />}
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </main>
 
@@ -166,6 +178,26 @@ export default function App() {
         fixed charges out of the daily rate before projecting it across the days left in the month;
         the DPS figures follow the deposit-then-interest rule stated in the published sample data.
       </footer>
+    </div>
+    </ToastProvider>
+  );
+}
+
+/**
+ * Shown while a screen's chunk is downloading.
+ *
+ * Mirrors the real layout — a stat row above a wide card — so the page does not
+ * jump when the content arrives.
+ */
+function ScreenSkeleton() {
+  return (
+    <div className="space-y-5" aria-busy="true" aria-label="Loading">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="nb h-[104px] animate-pulse rounded-2xl bg-[var(--card)]" />
+        ))}
+      </div>
+      <div className="nb h-64 animate-pulse rounded-2xl bg-[var(--card)]" />
     </div>
   );
 }

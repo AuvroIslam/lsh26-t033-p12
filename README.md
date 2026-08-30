@@ -391,10 +391,10 @@ npm test             # 27 checks over the fixture, the forecast and the receipt 
 application requires no environment variables: there is no API key, token or database URL, because
 receipt reading happens in the browser and the ledger is held in `localStorage`.
 
-**A judge can test everything without any paid account.** Receipt reading uses Tesseract.js, which
-fetches its English language data from a public CDN on first use and then runs locally. If that fetch
-is unavailable, the review panel reports it plainly and *Add an expense by hand* remains a complete
-path to the same ledger.
+**A judge can test everything without any paid account, and without a working network.** The OCR
+engine, its WASM core and the English language data are all served from this application out of
+`public/tesseract/` — nothing is fetched from a CDN at any point, so receipt reading works on
+throttled venue wifi or fully offline, and no user's receipt image goes near a third party.
 
 ### Repository layout
 
@@ -471,9 +471,15 @@ donut chart rendering as an open arc, and a pocket badge that contradicted the b
 | Charts | Recharts 2 |
 | State | Zustand 5, persisted to `localStorage` |
 | Receipt reading | Tesseract.js 5, in-browser |
-| Testing | Node.js built-in test runner |
+| Testing | Node.js built-in test runner, plus Playwright-driven browser checks |
 | Deployment | Vercel — static build, config in [`vercel.json`](vercel.json) |
 | Backend / database | None by design |
+
+**Resilience and feedback.** Each screen is wrapped in an error boundary keyed to its tab, so a
+thrown render shows a recovery panel — and an escape route if the stored ledger itself is corrupt —
+rather than the blank page React 19 otherwise leaves behind. Every action that changes money raises
+a toast naming the amount, and deletions carry an **Undo**. The four screens are code-split, so the
+initial download is 211 KB rather than the 674 KB it was when Recharts sat in the main bundle.
 
 **Interface.** A soft neo-brutalist treatment: solid dark borders with hard, unblurred offset shadows,
 rounded cards on a lavender ground, and a rotating pastel accent set. Money is the deliberate
@@ -549,9 +555,10 @@ in it is not something the code can produce.
   if site data is cleared.
 - **Two months are charted.** The dashboard compares the month containing "today" with the one before
   it, matching what the fixture supplies. Longer histories are not visualised.
-- **The main JavaScript bundle is ~674 KB** (~186 KB gzipped), largely Recharts. Tesseract.js is
-  already split into its own chunk and fetched only when a receipt is uploaded; the chart library
-  could be split further.
+- **OCR is a real engine, not a cloud model.** Tesseract with preprocessing reads a clean or
+  moderately difficult receipt reliably, but a crumpled, heavily creased or very low-contrast
+  photograph will still misread — which is exactly why every field is editable and why low-confidence
+  fields are flagged rather than quietly accepted.
 
 ---
 

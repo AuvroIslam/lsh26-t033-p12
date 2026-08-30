@@ -13,6 +13,8 @@ import { displayMoney, formatMoney, parseMoney } from '../lib/money';
 import { dateLabel, monthOf, systemToday } from '../lib/dates';
 import { CATEGORIES, type Category } from '../lib/types';
 import { parseReceiptText, type ParsedReceipt } from '../services/receipt.service';
+import { preprocessReceipt } from '../services/preprocess.service';
+import { useToast } from '../components/Toast';
 import { useLedger } from '../store/ledger.store';
 import { colorFor } from './DashboardScreen';
 
@@ -28,6 +30,7 @@ const LOW_CONFIDENCE = 0.75;
 
 export default function ExpensesScreen() {
   const { salary, expenses, today, setSalary, addExpense, deleteExpense } = useLedger();
+  const toast = useToast();
 
   const [salaryInput, setSalaryInput] = useState(() => (salary ? formatMoney(salary) : ''));
   const [manual, setManual] = useState<Draft>({
@@ -40,6 +43,9 @@ export default function ExpensesScreen() {
   // Receipt flow state.
   const [ocrBusy, setOcrBusy] = useState(false);
   const [ocrProgress, setOcrProgress] = useState(0);
+  const [ocrStage, setOcrStage] = useState('');
+  const [processedUrl, setProcessedUrl] = useState<string | null>(null);
+  const [showProcessed, setShowProcessed] = useState(false);
   const [ocrError, setOcrError] = useState<string | null>(null);
   const [parsed, setParsed] = useState<ParsedReceipt | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -66,7 +72,15 @@ export default function ExpensesScreen() {
 
   const onSalarySave = () => {
     const p = parseMoney(salaryInput);
-    if (p > 0) setSalary(p);
+    if (p <= 0) return;
+    const previous = salary;
+    setSalary(p);
+    toast.push({
+      tone: 'good',
+      title: `Salary set to ${displayMoney(p)}`,
+      body: 'The dashboard, forecast and pockets now measure against this figure.',
+      undo: previous > 0 ? () => setSalary(previous) : undefined,
+    });
   };
 
   const onManualSave = () => {
@@ -80,6 +94,11 @@ export default function ExpensesScreen() {
       source: 'manual',
     });
     setManual({ amount: '', date: manual.date, shop: '', category: manual.category });
+    toast.push({
+      tone: 'good',
+      title: `Added ${displayMoney(amount)} at ${manual.shop.trim()}`,
+      body: `${manual.category} · ${dateLabel(manual.date)}`,
+    });
   };
 
   /** Read a receipt image with Tesseract, then hand the result to the review form. */
@@ -100,10 +119,35 @@ export default function ExpensesScreen() {
     setImageData(dataUrl);
 
     try {
-      // Imported lazily so the 2 MB OCR bundle is only fetched when a receipt is
+      // Straighten the photograph before the engine sees it. A phone picture
+      // has uneven lighting and far more pixels than Tesseract wants; this is
+      // the single largest accuracy lever available without a cloud model.
+      setOcrStage('Preparing the image');
+      let ocrInput: File | Blob = file;
+      try {
+        const prepared = await preprocessReceipt(file);
+        ocrInput = prepared.blob;
+        setProcessedUrl(prepared.dataUrl);
+      } catch {
+        // Preprocessing must never be the reason a receipt cannot be read;
+        // fall through and let the engine try the original.
+        setProcessedUrl(null);
+      }
+
+      // Imported lazily so the OCR bundle is only fetched when a receipt is
       // actually uploaded, keeping the first paint fast.
+      setOcrStage('Reading the receipt');
       const { default: Tesseract } = await import('tesseract.js');
-      const result = await Tesseract.recognize(file, 'eng', {
+      const base = import.meta.env.BASE_URL;
+      const result = await Tesseract.recognize(ocrInput, 'eng', {
+        // The engine, its WASM core and the language data are all served from
+        // this application rather than a CDN, so receipt reading works on a
+        // blocked, throttled or offline network and makes no third-party
+        // request with the user's image anywhere near it.
+        workerPath: `${base}tesseract/worker.min.js`,
+        corePath: `${base}tesseract/tesseract-core-simd-lstm.wasm.js`,
+        langPath: `${base}tesseract`,
+        gzip: true,
         logger: (m: { status: string; progress: number }) => {
           if (m.status === 'recognizing text') setOcrProgress(Math.round(m.progress * 100));
         },
@@ -124,6 +168,7 @@ export default function ExpensesScreen() {
       );
     } finally {
       setOcrBusy(false);
+      setOcrStage('');
     }
   };
 
@@ -146,6 +191,13 @@ export default function ExpensesScreen() {
         imageDataUrl: imageData,
       },
     });
+    toast.push({
+      tone: 'good',
+      title: `Saved ${displayMoney(amount)} at ${review.shop.trim()}`,
+      body: correctedFields.length
+        ? `Corrected before saving: ${correctedFields.join(', ')}.`
+        : 'Accepted exactly as it was read.',
+    });
     discardReview();
   };
 
@@ -155,6 +207,8 @@ export default function ExpensesScreen() {
     if (imageUrl) URL.revokeObjectURL(imageUrl);
     setImageUrl(null);
     setImageData(undefined);
+    setProcessedUrl(null);
+    setShowProcessed(false);
     setShowRaw(false);
     if (fileRef.current) fileRef.current.value = '';
   };
@@ -225,7 +279,9 @@ export default function ExpensesScreen() {
 
           {ocrBusy && (
             <div className="rounded-xl border border-[var(--edge)] px-5 py-8 text-center">
-              <p className="text-[13px] font-semibold text-[var(--text)]">Reading the receipt…</p>
+              <p className="text-[13px] font-extrabold text-[var(--text)]">
+                {ocrStage || 'Reading the receipt'}…
+              </p>
               <div className="mx-auto mt-3 h-1.5 w-64 overflow-hidden rounded-full bg-[var(--card-sunk)]">
                 <div
                   className="h-full rounded-full bg-lav-400 transition-[width]"
@@ -484,7 +540,23 @@ export default function ExpensesScreen() {
                     </td>
                     <td className="px-5 py-2.5 text-right">
                       <button
-                        onClick={() => deleteExpense(e.id)}
+                        onClick={() => {
+                          deleteExpense(e.id);
+                          toast.push({
+                            tone: 'bad',
+                            title: `Removed ${displayMoney(e.amount)} at ${e.shop}`,
+                            body: dateLabel(e.date),
+                            undo: () =>
+                              addExpense({
+                                date: e.date,
+                                category: e.category,
+                                shop: e.shop,
+                                amount: e.amount,
+                                source: e.source,
+                                receipt: e.receipt,
+                              }),
+                          });
+                        }}
                         className="text-[12px] font-semibold text-blush-ink hover:underline"
                       >
                         Remove

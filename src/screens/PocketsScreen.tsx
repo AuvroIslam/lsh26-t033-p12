@@ -27,11 +27,13 @@ import { monthLabel, monthLabelShort, monthOf } from '../lib/dates';
 import { buildForecast, buildMonthSummary } from '../services/forecast.service';
 import { projectPockets, type PocketProjection } from '../services/pocket.service';
 import { useLedger } from '../store/ledger.store';
+import { useToast } from '../components/Toast';
 import { tooltipStyle } from './DashboardScreen';
 
 export default function PocketsScreen() {
   const state = useLedger();
   const { addPocket, deletePocket, setDpsRate } = useLedger();
+  const toast = useToast();
   const thisMonth = monthOf(state.today);
 
   const summary = useMemo(() => buildMonthSummary(state, thisMonth), [state, thisMonth]);
@@ -54,6 +56,11 @@ export default function PocketsScreen() {
       monthlyContribution: monthly,
     });
     setDraft({ name: '', item: '', target: '', monthly: '' });
+    toast.push({
+      tone: 'good',
+      title: `Pocket "${draft.name.trim()}" created`,
+      body: `${displayMoney(target)} target at ${displayMoney(monthly)} a month.`,
+    });
   };
 
   const totalCommitted = state.pockets.reduce((s, p) => s + p.monthlyContribution, 0);
@@ -143,7 +150,22 @@ export default function PocketsScreen() {
               key={p.pocket.id}
               projection={p}
               rate={state.dpsAnnualRatePercent}
-              onDelete={() => deletePocket(p.pocket.id)}
+              onDelete={() => {
+                const gone = p.pocket;
+                deletePocket(gone.id);
+                toast.push({
+                  tone: 'bad',
+                  title: `Removed the "${gone.name}" pocket`,
+                  body: `${displayMoney(gone.target)} target.`,
+                  undo: () =>
+                    addPocket({
+                      name: gone.name,
+                      item: gone.item,
+                      target: gone.target,
+                      monthlyContribution: gone.monthlyContribution,
+                    }),
+                });
+              }}
             />
           ))}
         </div>
