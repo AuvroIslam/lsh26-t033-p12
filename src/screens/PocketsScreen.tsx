@@ -269,11 +269,14 @@ function PocketCard({
           tone="brand"
         />
         <Figure
-          label={`DPS value at ${rate.toFixed(2)}%`}
-          value={displayMoney(p.dpsValueAtCompletion)}
+          label={`Same money in a DPS at ${rate.toFixed(2)}%`}
+          value={p.dpsCompletionMonth ? monthLabel(p.dpsCompletionMonth) : '—'}
           sub={
-            p.dps.length
-              ? `${displayMoney(p.contributedAtCompletion)} deposited + ${displayMoney(p.dpsInterest)} interest`
+            p.dpsMonthsToTarget
+              ? `Target reached in ${p.dpsMonthsToTarget} months` +
+                (p.monthsSavedByDps && p.monthsSavedByDps > 0
+                  ? `, ${p.monthsSavedByDps} sooner than saving alone`
+                  : '')
               : undefined
           }
           tone="good"
@@ -397,6 +400,17 @@ function PocketCard({
                 <strong className="text-ink-900">{displayMoney(p.dpsValueAtCompletion)}</strong> —{' '}
                 {displayMoney(p.dpsInterest)} more than the {displayMoney(p.contributedAtCompletion)}{' '}
                 deposited, against a target of {displayMoney(pocket.target)}.
+                {p.dpsMonthsToTarget && p.monthsSavedByDps !== null && p.monthsSavedByDps > 0 && (
+                  <>
+                    {' '}
+                    Because the interest compounds, a DPS covers the{' '}
+                    {displayMoney(pocket.target)} target after only{' '}
+                    <strong className="text-ink-900">{p.dpsMonthsToTarget} months</strong> —{' '}
+                    {p.monthsSavedByDps}{' '}
+                    {p.monthsSavedByDps === 1 ? 'month' : 'months'} sooner than setting the same
+                    amount aside without interest.
+                  </>
+                )}
               </p>
             </div>
           )}

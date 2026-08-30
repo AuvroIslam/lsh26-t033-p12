@@ -88,6 +88,12 @@ export interface PocketProjection {
   contributedAtCompletion: Paisa;
   /** Interest the DPS adds over the horizon. */
   dpsInterest: Paisa;
+  /** Months for a DPS to reach the target, which interest makes sooner. */
+  dpsMonthsToTarget: number | null;
+  /** "YYYY-MM" a DPS reaches the target. */
+  dpsCompletionMonth: string | null;
+  /** Months saved by using a DPS rather than holding the deposits plain. */
+  monthsSavedByDps: number | null;
 }
 
 const MAX_MONTHS = 600; // 50 years; a guard so a tiny contribution cannot spin.
@@ -96,6 +102,28 @@ function monthsToReach(target: Paisa, monthly: Paisa): number | null {
   if (monthly <= 0) return null;
   const n = Math.ceil(target / monthly);
   return n > MAX_MONTHS ? null : n;
+}
+
+/**
+ * Months for a DPS to reach the target.
+ *
+ * Interest means the target arrives sooner than plain deposits manage, so this
+ * runs the schedule until the balance first covers the target rather than
+ * dividing. Returns null if it would never get there inside the guard.
+ */
+function monthsToReachWithDps(
+  target: Paisa,
+  deposit: Paisa,
+  annualRatePct: number,
+): number | null {
+  if (deposit <= 0) return null;
+  let balance = 0;
+  for (let i = 1; i <= MAX_MONTHS; i++) {
+    balance += deposit;
+    balance += roundHalfUp((balance * annualRatePct) / 12 / 100);
+    if (balance >= target) return i;
+  }
+  return null;
 }
 
 /**
@@ -127,6 +155,12 @@ export function projectPocket(
   const dps = horizon > 0 ? dpsSchedule(pocket.monthlyContribution, annualRatePct, horizon, startMonth) : [];
   const lastRow = dps[dps.length - 1];
 
+  const dpsMonths = monthsToReachWithDps(
+    pocket.target,
+    pocket.monthlyContribution,
+    annualRatePct,
+  );
+
   return {
     pocket,
     monthsToTarget,
@@ -142,6 +176,10 @@ export function projectPocket(
     dpsValueAtCompletion: lastRow?.balance ?? 0,
     contributedAtCompletion: lastRow?.contributedSoFar ?? 0,
     dpsInterest: lastRow ? lastRow.balance - lastRow.contributedSoFar : 0,
+    dpsMonthsToTarget: dpsMonths,
+    dpsCompletionMonth: dpsMonths ? addMonths(startMonth, dpsMonths - 1) : null,
+    monthsSavedByDps:
+      dpsMonths !== null && monthsToTarget !== null ? monthsToTarget - dpsMonths : null,
   };
 }
 

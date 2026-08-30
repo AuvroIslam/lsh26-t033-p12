@@ -182,3 +182,41 @@ test('every case carries both months, three pockets and a usable rate', () => {
     assert.ok(cur.length > 0, `${c.case_id}: no expenses this month`);
   }
 });
+
+test('a DPS reaches the target sooner than plain deposits, on every case', () => {
+  const monthsToReachWithDps = (target, deposit, ratePct) => {
+    let balance = 0;
+    for (let i = 1; i <= 600; i++) {
+      balance += deposit;
+      balance += roundHalfUp((balance * ratePct) / 12 / 100);
+      if (balance >= target) return i;
+    }
+    return null;
+  };
+
+  for (const c of fixture.cases) {
+    const rate = Number(c.dps_annual_rate_percent);
+    for (const p of c.pockets) {
+      const deposit = parseMoney(p.monthly_contribution_bdt);
+      const target = parseMoney(p.target_bdt);
+      const plain = Math.ceil(target / deposit);
+      const withDps = monthsToReachWithDps(target, deposit, rate);
+      assert.ok(withDps !== null, `${c.case_id} ${p.id}: DPS should reach the target`);
+      assert.ok(
+        withDps <= plain,
+        `${c.case_id} ${p.id}: DPS took ${withDps} months, plain saving ${plain}`,
+      );
+    }
+  }
+});
+
+test('the DPS completion month is consistent with the schedule balance', () => {
+  // At 8% on 20000.00 toward 300000.00, the balance must first cover the
+  // target in exactly the month the completion helper reports.
+  const rows = dpsSchedule(2000000, 8, 20);
+  const target = 30000000;
+  const firstCovering = rows.findIndex((r) => r.balance >= target) + 1;
+  assert.ok(firstCovering > 0, 'the target should be reached inside 20 months');
+  assert.ok(rows[firstCovering - 1].balance >= target);
+  assert.ok(rows[firstCovering - 2].balance < target, 'the month before must fall short');
+});
