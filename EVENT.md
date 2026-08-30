@@ -37,6 +37,20 @@ declared only because familiarity with that problem area informed how this solut
 Everything here was written fresh for P12 during the event window, and the commit history shows it
 being built.
 
+## Committer identities
+
+The history carries two git author identities:
+
+| Identity | Email | Commits |
+|---|---|---|
+| `AuvroIslam` | crossgame2002@gmail.com | The first two, adding the submission-kit templates and the fixture |
+| `ripWr3ncH` | wrench.official0@gmail.com | The remainder, containing the application |
+
+<!-- TODO before submitting: state plainly which registered member each identity belongs to.
+     If both are the same person under two git configurations, say so in one line. If they are
+     two different registered members, name them. Judges read the history, and an undeclared
+     identity that authored the codebase invites a question that is easier to answer here. -->
+
 ## AI assistance
 
 Claude (Anthropic), via Claude Code, was used for scaffolding, implementation and review during the

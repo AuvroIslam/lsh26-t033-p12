@@ -110,7 +110,7 @@ npm run dev          # http://localhost:5173
 ```bash
 npm run build        # type-check and produce dist/
 npm run preview      # serve the production build
-npm test             # 22 checks over the published fixture and the receipt parser
+npm test             # 27 checks over the published fixture, the forecast and the receipt parser
 ```
 
 There is nothing to configure. [`.env.example`](.env.example) exists only to record that the
@@ -131,6 +131,15 @@ its output explained, and R4 is the DPS engine fed by it. Both were therefore wr
 functions with no React dependency, in [`src/services/`](src/services/), and tested directly against
 the published fixture.
 
+The forecast went through one significant revision. It began as a flat daily rate over all spending,
+which is the obvious implementation and is wrong: rent lands once and early, so dividing it across
+the days elapsed and re-projecting it over the days remaining charges it repeatedly. Measured across
+the published cases, that inflated the projection by as much as ৳46,000 and reversed the surplus or
+shortfall verdict on six of the twenty-five — the projection is the requirement's central output, so
+a method that gets the sign wrong on a quarter of the sample is not a rounding concern. Fixed charges
+are now identified from their billing shape and held out of the rate, and a regression test records
+that the flat method called eight cases short where only two genuinely are.
+
 The most important technical decision was to hold every amount as **integer paisa** rather than a
 floating-point number of Taka. The fixture supplies decimal strings such as `856.50`, and the DPS
 rule compounds monthly with half-up rounding at each step, so floating-point drift would show up in
@@ -144,7 +153,7 @@ explaining its reasoning, and the interface refuses to save until a person has s
 why the total is chosen by excluding subtotal, tax, cash and change lines rather than by taking the
 largest number — the naive approach reads `Cash 2000.00` instead of `TOTAL 1580.78`.
 
-Testing was done in two layers: `npm test` runs 22 assertions over the pure logic and the whole
+Testing was done in two layers: `npm test` runs 27 assertions over the pure logic and the whole
 published fixture, and the application was driven in a real browser against a generated receipt
 image to confirm the reading, review and saving path works end to end.
 
@@ -184,10 +193,15 @@ Commit count alone does not represent contribution.
   what was read and allowing correction, which this satisfies without any account.
 - **Money is integer paisa throughout.** The fixture gives decimal strings and the DPS rule
   compounds with per-month rounding; floats would drift in the figures being marked.
-- **The forecast is a flat daily run rate**, `spent so far ÷ days elapsed`, projected across the days
-  remaining. Two months of history cannot support a seasonal or day-of-week model, and a projection a
-  judge can reproduce on a calculator is worth more here than a black box. The arithmetic is printed
-  on the Forecast screen for exactly that reason.
+- **The forecast separates recurring fixed charges from day-to-day spending.** A flat rate over
+  everything divides rent across the days elapsed and then re-projects it over the days remaining,
+  charging it two or three times over. On the published cases that inflated the projection by up to
+  ৳46,000 and, on six of the twenty-five, reversed the answer to the question the requirement asks —
+  reporting a shortfall for a month that ends in surplus. A category counts as fixed when it billed
+  exactly once last month, at most once this month, and is worth at least three days of average
+  spending; the test is made against the data rather than a hardcoded list of category names, so a
+  hand-typed ledger behaves like a loaded sample case. The method stays reproducible by hand — two
+  averages and an addition — and the arithmetic is printed on the Forecast screen.
 - **"Today" comes from the loaded case, not the system clock.** The published cases are dated in
   2026; using the real date would put every expense in the past and make every forecast wrong.
 - **No backend and no sign-in.** P12 is a single-person ledger with no sharing, so an account would
@@ -198,10 +212,11 @@ Commit count alone does not represent contribution.
 
 ## Known limitations
 
-- The forecast applies one flat daily rate, so a large one-off charge still to come — next month's
-  rent, an annual fee — is only represented at the average rate. Charges already paid sit inside
-  "spent so far" and are not projected twice, but a bill that has not landed yet will make the
-  projection read low.
+- The forecast recognises a recurring fixed charge from two months of history. A charge appearing
+  for the first time this month cannot be distinguished from ordinary spending, so it is absorbed
+  into the daily rate; a genuinely irregular large purchase will therefore still push the projection
+  up. A fixed charge that billed last month but has not yet appeared is added once, at last month's
+  amount, so a rent rise is not anticipated until it lands.
 - OCR accuracy depends on the photograph. A skewed, blurred or low-contrast receipt may misread the
   amount or the date, which is why every field is editable and low-confidence fields are flagged.
   Handwritten receipts are generally not readable.

@@ -220,3 +220,114 @@ test('the DPS completion month is consistent with the schedule balance', () => {
   assert.ok(rows[firstCovering - 1].balance >= target);
   assert.ok(rows[firstCovering - 2].balance < target, 'the month before must fall short');
 });
+
+// --- fixed-charge-aware forecast ------------------------------------------
+
+/**
+ * The detector, re-expressed: a category is fixed when it billed exactly once
+ * last month, at most once this month, and is large enough to matter.
+ */
+const findFixed = (curM, lstM, spent, dimM) => {
+  const floor = (spent / dimM) * 3;
+  const fixed = new Set();
+  for (const k of new Set([...curM.keys(), ...lstM.keys()])) {
+    const l = lstM.get(k);
+    const c = curM.get(k);
+    const size = Math.max(c?.t ?? 0, l?.t ?? 0);
+    if (l && l.n === 1 && (!c || c.n <= 1) && size >= floor) fixed.add(k);
+  }
+  return fixed;
+};
+
+const aggregate = (rows) => {
+  const m = new Map();
+  for (const e of rows) {
+    const v = m.get(e.category) ?? { t: 0, n: 0 };
+    m.set(e.category, { t: v.t + parseMoney(e.amount_bdt), n: v.n + 1 });
+  }
+  return m;
+};
+
+const forecastFor = (c) => {
+  const curM = aggregate(c.expenses.filter((e) => e.date.slice(0, 7) === c.months.this));
+  const lstM = aggregate(c.expenses.filter((e) => e.date.slice(0, 7) === c.months.last));
+  const spent = [...curM.values()].reduce((s, v) => s + v.t, 0);
+  const D = daysInMonth(c.months.this);
+  const elapsed = Number(c.today.slice(8, 10));
+  const fixed = findFixed(curM, lstM, spent, D);
+  let fixedPaid = 0;
+  let outstanding = 0;
+  for (const k of fixed) {
+    const cc = curM.get(k);
+    const l = lstM.get(k);
+    if (cc) fixedPaid += cc.t;
+    else if (l) outstanding += l.t;
+  }
+  const rate = roundHalfUp((spent - fixedPaid) / elapsed);
+  return {
+    fixed,
+    spent,
+    fixedPaid,
+    outstanding,
+    rate,
+    projected: spent + rate * (D - elapsed) + outstanding,
+    flat: spent + roundHalfUp(spent / elapsed) * (D - elapsed),
+    salary: parseMoney(c.salary_bdt),
+  };
+};
+
+test('rent is identified as a fixed charge on every published case', () => {
+  for (const c of fixture.cases) {
+    const f = forecastFor(c);
+    assert.ok(f.fixed.has('Rent'), `${c.case_id}: rent should be treated as fixed`);
+  }
+});
+
+test('a one-off lunch is not mistaken for a fixed charge', () => {
+  // The materiality floor exists for exactly this: a category can bill once
+  // either side of the month and still be day-to-day spending.
+  for (const c of fixture.cases) {
+    const f = forecastFor(c);
+    const dim = daysInMonth(c.months.this);
+    const floor = (f.spent / dim) * 3;
+    for (const cat of f.fixed) {
+      const curM = aggregate(c.expenses.filter((e) => e.date.slice(0, 7) === c.months.this));
+      const lstM = aggregate(c.expenses.filter((e) => e.date.slice(0, 7) === c.months.last));
+      const size = Math.max(curM.get(cat)?.t ?? 0, lstM.get(cat)?.t ?? 0);
+      assert.ok(size >= floor, `${c.case_id}: ${cat} was classed as fixed while below the floor`);
+    }
+  }
+});
+
+test('holding fixed charges out never inflates the projection', () => {
+  // The whole point of the change: a charge that lands once must not be
+  // smeared across the elapsed days and then re-projected over the rest.
+  for (const c of fixture.cases) {
+    const f = forecastFor(c);
+    assert.ok(
+      f.projected <= f.flat,
+      `${c.case_id}: fixed-aware ${f.projected} exceeded flat ${f.flat}`,
+    );
+  }
+});
+
+test('the projection still covers everything already spent', () => {
+  for (const c of fixture.cases) {
+    const f = forecastFor(c);
+    assert.ok(f.projected >= f.spent, `${c.case_id}: projection fell below actual spending`);
+  }
+});
+
+test('the flat rate would have reported six false shortfalls', () => {
+  // Recorded so that a regression away from the fixed-charge split shows up
+  // as a failure here rather than as a quietly wrong verdict on screen.
+  let flatShort = 0;
+  let awareShort = 0;
+  for (const c of fixture.cases) {
+    const f = forecastFor(c);
+    if (f.flat > f.salary) flatShort++;
+    if (f.projected > f.salary) awareShort++;
+  }
+  assert.equal(flatShort, 8, 'the flat rate calls eight cases short');
+  assert.equal(awareShort, 2, 'only two cases are genuinely heading over salary');
+});

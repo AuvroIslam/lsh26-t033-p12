@@ -24,7 +24,7 @@
     },
     "R3": {
       "status": "complete",
-      "evidence": "Forecast & insights tab: daily rate so far, expected spending for the rest of the month, projected month total, and projected money left or short at month end, plus a spending-path chart drawn solid to today and dashed thereafter against the salary line. The arithmetic is printed in full under 'How the forecast is calculated' so it can be reproduced by hand. Eight insights are generated from the figures and ranked by how much money each concerns; every generator returns nothing when the data does not support it, so no insight can appear without naming a real category and amount. On sample case PUB-01 they include 'Mobile is up ৳2,500.00 on last month' (৳3,589.00 against ৳1,089.00 in March, a rise of 229.6%), 'Groceries is down ৳7,713.00 on last month', and 'Rent, Mobile, Utilities are 82% of spending'. Code: src/services/insight.service.ts, src/screens/ForecastScreen.tsx."
+      "evidence": "Forecast & insights tab: the day-to-day spending rate with recurring fixed charges held out of it, expected spending for the rest of the month, projected month total, and projected money left or short at month end, plus a spending-path chart drawn solid to today and dashed thereafter against the salary line. The arithmetic is printed in full under 'How the forecast is calculated' so it can be reproduced by hand. Eight insights are generated from the figures and ranked by how much money each concerns; every generator returns nothing when the data does not support it, so no insight can appear without naming a real category and amount. On sample case PUB-01 they include 'Mobile is up ৳2,500.00 on last month' (৳3,589.00 against ৳1,089.00 in March, a rise of 229.6%), 'Groceries is down ৳7,713.00 on last month', and 'Rent, Mobile, Utilities are 82% of spending'. Code: src/services/insight.service.ts, src/screens/ForecastScreen.tsx."
     },
     "R4": {
       "status": "complete",
@@ -48,13 +48,13 @@
   "major_design_decisions": [
     "Receipt reading runs in the browser with Tesseract.js rather than a hosted vision API. A cloud model would read more accurately, but it needs an API key and the rules forbid committing one, which would leave a judge unable to exercise the feature. The requirement's weight is on showing what was read and allowing correction, which this satisfies with no account and no network dependency beyond the one-time language-data fetch.",
     "All money is integer paisa, converted from the fixture's decimal strings on load and formatted only for display. The DPS rule compounds monthly with half-up rounding at each step, so floating-point arithmetic would drift in the figures a judge checks. A test asserts every one of the 1,200-plus amounts across all 25 cases round-trips back to its original string.",
-    "The forecast is a flat daily run rate — spending so far divided by days elapsed, projected across the days remaining. Two months of history cannot support a seasonal or day-of-week model, and a projection that can be reproduced on a calculator is worth more than a black box, so the arithmetic is printed on screen.",
+    "The forecast separates recurring fixed charges from day-to-day spending rather than applying one flat rate to everything. A flat rate divides rent across the days elapsed and then re-projects it over the days remaining, charging it several times over; across the published cases that inflated the projection by up to 46,000.00 BDT and reversed the surplus-or-shortfall verdict on six of the twenty-five. A category counts as fixed when it billed exactly once last month, at most once this month, and is worth at least three days of average spending — judged from the data rather than a hardcoded list of category names, so a hand-typed ledger behaves like a loaded sample case. The method remains reproducible by hand and the arithmetic is printed on the Forecast screen.",
     "The date the app treats as 'today' comes from the loaded case rather than the system clock. The published cases are dated in 2026; using the real date would place every expense in the past and make every forecast wrong.",
     "No backend and no sign-in. P12 is a single-person ledger with no sharing, so an account would put a wall between a judge and the four requirements without changing any figure on screen. State is held in localStorage.",
     "Insights are generated from the data rather than chosen from a list of advice. Each generator reads the month summary and returns nothing when the data does not support it, so an insight cannot appear without a real category and amount in it."
   ],
   "known_limitations": [
-    "The forecast applies one flat daily rate, so a large one-off charge still to come — rent, an annual fee — is only represented at the average rate and will make the projection read low. Charges already paid sit inside 'spent so far' and are not projected twice.",
+    "The forecast recognises a recurring fixed charge from two months of history. A charge appearing for the first time this month cannot be told apart from ordinary spending and is absorbed into the daily rate, so a genuinely irregular large purchase will still push the projection up. A fixed charge that billed last month but has not yet appeared is added once at last month's amount, so a rent rise is not anticipated until it lands.",
     "OCR accuracy depends on the photograph; a skewed, blurred or low-contrast receipt may misread the amount or date, which is why every field is editable and low-confidence fields are flagged. Handwritten receipts are generally not readable.",
     "Only English-language receipt layouts are parsed. Bengali total keywords are recognised but Bengali OCR is not enabled, so a wholly Bengali receipt needs manual correction.",
     "When the forecast surplus cannot cover every pocket, pockets are funded in the order they were created. Reordering priorities is not implemented.",
@@ -65,7 +65,7 @@
     {
       "tool": "Claude (Anthropic), via Claude Code",
       "used_for": "Repository scaffolding, implementation and review during the event window.",
-      "how_output_was_verified": "Code was read by the team, checked with `npm test` (22 assertions over the published fixture and the receipt parser), and exercised in a browser against a generated receipt image to confirm the reading, review and saving path works end to end."
+      "how_output_was_verified": "Code was read by the team, checked with `npm test` (27 assertions over the published fixture and the receipt parser), and exercised in a browser against a generated receipt image to confirm the reading, review and saving path works end to end."
     }
   ],
   "licenses_file": "LICENSES.md",

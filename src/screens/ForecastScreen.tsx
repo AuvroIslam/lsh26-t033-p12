@@ -79,9 +79,13 @@ export default function ForecastScreen() {
     <div className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
-          label="Daily rate so far"
+          label="Day-to-day rate"
           value={displayMoney(forecast.dailyRate)}
-          sub={`${displayMoney(summary.totalSpent)} over ${forecast.daysElapsed} days`}
+          sub={
+            forecast.fixedPaid > 0
+              ? `${displayMoney(forecast.variableSpent)} over ${forecast.daysElapsed} days, apart from ${displayMoney(forecast.fixedPaid)} of fixed charges`
+              : `${displayMoney(summary.totalSpent)} over ${forecast.daysElapsed} days`
+          }
         />
         <Stat
           label="Expected rest of month"
@@ -181,13 +185,25 @@ export default function ForecastScreen() {
             How the forecast is calculated
           </p>
           <p className="tabular mt-1.5 text-[13px] leading-relaxed text-ink-800">
-            Daily rate = {displayMoney(summary.totalSpent)} spent ÷ {forecast.daysElapsed} days elapsed
-            {' '}= <strong>{displayMoney(forecast.dailyRate)}</strong> a day.
+            {forecast.fixedPaid > 0 && (
+              <>
+                Recurring fixed charges are held out of the daily rate, so a charge that
+                lands once is not spread across the month:{' '}
+                <strong>{displayMoney(forecast.fixedPaid)}</strong> already paid.
+                <br />
+              </>
+            )}
+            Day-to-day rate = {displayMoney(forecast.variableSpent)} of day-to-day spending ÷{' '}
+            {forecast.daysElapsed} days elapsed{' '}
+            = <strong>{displayMoney(forecast.dailyRate)}</strong> a day.
             <br />
             Rest of month = {displayMoney(forecast.dailyRate)} × {forecast.daysRemaining} days remaining
-            {' '}= <strong>{displayMoney(forecast.restOfMonth)}</strong>.
+            {forecast.fixedOutstanding > 0 && (
+              <> + {displayMoney(forecast.fixedOutstanding)} still due</>
+            )}{' '}
+            = <strong>{displayMoney(forecast.restOfMonth)}</strong>.
             <br />
-            Projected total = {displayMoney(summary.totalSpent)} + {displayMoney(forecast.restOfMonth)}
+            Projected total = {displayMoney(summary.totalSpent)} spent + {displayMoney(forecast.restOfMonth)}
             {' '}= <strong>{displayMoney(forecast.projectedTotal)}</strong>.
             <br />
             Projected {forecast.projectedShort ? 'shortfall' : 'money left'} ={' '}
@@ -196,6 +212,16 @@ export default function ForecastScreen() {
               {displayMoney(forecast.projectedRemaining)}
             </strong>
             .
+            {forecast.fixedOutstandingCategories.length > 0 && (
+              <>
+                <br />
+                Still expected this month:{' '}
+                {forecast.fixedOutstandingCategories
+                  .map((f) => `${f.category} ${displayMoney(f.amount)}`)
+                  .join(', ')}
+                , added once rather than averaged across the remaining days.
+              </>
+            )}
           </p>
         </div>
       </Card>

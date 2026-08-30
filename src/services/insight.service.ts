@@ -47,8 +47,10 @@ export function buildInsights(
       tone: 'critical',
       title: `Projected ${fmt(-forecast.projectedRemaining)} short by month end`,
       body:
-        `You have spent ${fmt(totalSpent)} in ${forecast.daysElapsed} days, an average of ` +
-        `${fmt(forecast.dailyRate)} a day. Carried across the ${forecast.daysRemaining} days left, ` +
+        `You have spent ${fmt(totalSpent)} in ${forecast.daysElapsed} days, running at ` +
+        `${fmt(forecast.dailyRate)} a day on day-to-day spending. Carried across the ${forecast.daysRemaining} days left` +
+        (forecast.fixedOutstanding > 0 ? `, with ${fmt(forecast.fixedOutstanding)} of fixed charges still due` : '') +
+        `, `+
         `${thisMonth} ends at ${fmt(forecast.projectedTotal)} against a salary of ` +
         `${fmt(salary)} — a shortfall of ${fmt(-forecast.projectedRemaining)}. Holding spending to ` +
         `${fmt(forecast.safeDailyBudget)} a day for the rest of the month is what breaks even.`,
@@ -60,8 +62,9 @@ export function buildInsights(
       tone: 'positive',
       title: `On track to keep ${fmt(forecast.projectedRemaining)} this month`,
       body:
-        `Spending is running at ${fmt(forecast.dailyRate)} a day across ${forecast.daysElapsed} days. ` +
-        `Projecting that over the ${forecast.daysRemaining} days remaining puts ${thisMonth} at ` +
+        `Day-to-day spending is running at ${fmt(forecast.dailyRate)} a day across ${forecast.daysElapsed} days` +
+        (forecast.fixedPaid > 0 ? `, apart from ${fmt(forecast.fixedPaid)} of fixed charges already paid` : '') +
+        `. Projecting that over the ${forecast.daysRemaining} days remaining puts ${thisMonth} at ` +
         `${fmt(forecast.projectedTotal)}, leaving ${fmt(forecast.projectedRemaining)} of your ` +
         `${fmt(salary)} salary. Another ${fmt(forecast.restOfMonth)} is expected before the month closes.`,
       materiality: forecast.projectedRemaining * 2,
@@ -134,7 +137,9 @@ export function buildInsights(
           .map((c) => `${c.category} ${fmt(c.total)}`)
           .join(', ')} — come to ${fmt(top3Total)} between them, ` +
         `${pct(top3Total, totalSpent).toFixed(1)}% of everything spent this month. ` +
-        `The remaining ${spendingCats.length - 3} categories account for ${fmt(totalSpent - top3Total)}.`,
+        `The remaining ${spendingCats.length - 3} ` +
+        `${spendingCats.length - 3 === 1 ? 'category accounts' : 'categories account'} for ` +
+        `${fmt(totalSpent - top3Total)}.`,
       materiality: top3Total * 0.8,
     });
   }

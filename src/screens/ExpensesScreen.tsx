@@ -43,6 +43,7 @@ export default function ExpensesScreen() {
   const [ocrError, setOcrError] = useState<string | null>(null);
   const [parsed, setParsed] = useState<ParsedReceipt | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageData, setImageData] = useState<string | undefined>(undefined);
   const [review, setReview] = useState<Draft | null>(null);
   const [showRaw, setShowRaw] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -92,6 +93,12 @@ export default function ExpensesScreen() {
     const url = URL.createObjectURL(file);
     setImageUrl(url);
 
+    // The object URL above is only valid for this page view, so a copy is kept
+    // as a data URL for the saved expense — otherwise the stored reference is
+    // already dead by the time anyone reloads.
+    const dataUrl = await fileToDataUrl(file).catch(() => undefined);
+    setImageData(dataUrl);
+
     try {
       // Imported lazily so the 2 MB OCR bundle is only fetched when a receipt is
       // actually uploaded, keeping the first paint fast.
@@ -136,7 +143,7 @@ export default function ExpensesScreen() {
         parsed: { amount: parsed.amount, date: parsed.date, shop: parsed.shop },
         confidence: parsed.confidence,
         correctedFields,
-        imageDataUrl: imageUrl ?? undefined,
+        imageDataUrl: imageData,
       },
     });
     discardReview();
@@ -145,7 +152,9 @@ export default function ExpensesScreen() {
   const discardReview = () => {
     setParsed(null);
     setReview(null);
+    if (imageUrl) URL.revokeObjectURL(imageUrl);
     setImageUrl(null);
+    setImageData(undefined);
     setShowRaw(false);
     if (fileRef.current) fileRef.current.value = '';
   };
@@ -431,7 +440,18 @@ export default function ExpensesScreen() {
                 {sorted.map((e) => (
                   <tr key={e.id} className={monthOf(e.date) === monthOf(today) ? '' : 'opacity-60'}>
                     <td className="tabular px-5 py-2.5 whitespace-nowrap">{dateLabel(e.date)}</td>
-                    <td className="px-3 py-2.5 font-medium">{e.shop}</td>
+                    <td className="px-3 py-2.5 font-medium">
+                      <span className="flex items-center gap-2">
+                        {e.receipt?.imageDataUrl && (
+                          <img
+                            src={e.receipt.imageDataUrl}
+                            alt=""
+                            className="size-7 shrink-0 rounded border border-[var(--border)] object-cover"
+                          />
+                        )}
+                        {e.shop}
+                      </span>
+                    </td>
                     <td className="px-3 py-2.5">
                       <span className="flex items-center gap-1.5">
                         <span
@@ -475,6 +495,21 @@ export default function ExpensesScreen() {
       </Card>
     </div>
   );
+}
+
+/**
+ * Read a file as a data URL.
+ *
+ * Used so a saved receipt keeps a thumbnail that survives a reload; a blob:
+ * object URL would not, since it dies with the page view that created it.
+ */
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
 }
 
 /** Tells the user, per field, whether the read is worth a second look. */
